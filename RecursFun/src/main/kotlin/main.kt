@@ -1,121 +1,108 @@
 import kotlin.random.Random
+import com.TimeUtils.utils.*
 
 fun main() {
-
-    // подразумевается через коммандную строку
-    // померить глубину запросов
-
     val menuText = """
-        Выберете, как желаете заполнить массив?
+        Выберите, как желаете заполнить массив?
         1. Ручной ввод
         2. Автоматическое заполнение
         3. Измерить глубину рекурсии
     """.trimIndent()
 
     println(menuText)
+    val choice = readLine()?.toIntOrNull()
 
-    val qest = readLine()?.toInt()
+    when (choice) {
+        1 -> {
+            val mass = manualArr()
+            println("Целые числа: ${mass.joinToString()}")
 
-    // ручной ввод
-    if (qest == 1){
+            // Выполнение расчётов для вывода результатов
+            val resRecursive = averageRecursive(mass, mass.size)
+            println("Среднее арифметическое через рекурсию: $resRecursive")
 
-        val mass = manualArr()
+            val resIterative = iterationAverage(mass, mass.size)
+            println("Среднее арифметическое через сумму: $resIterative")
 
-        println("Целые числа: ${mass.joinToString()}")
+            println()
 
-        val res = averageRecursive(mass, mass.size)
-        println("Среднее арифметическое через рекурсию: $res")
+            // Замер рекурсивного выполнения
+            val timeRecursive = measureExecutionTime(
+                iterations = mass.size,
+                label = "рекурсию"
+            ) {
+                averageRecursive(mass, mass.size)
+            }
 
-        val resAverage = iterationAverage(mass, mass.size)
-        println("Среднее арифметическое через сумму: $resAverage")
+            println()
 
-        // возвращает текущее врнемя системы в наносекундах
-        val startTime = System.nanoTime()
+            // Замер итеративной версии
+            val timeIterative = measureExecutionTime(
+                iterations = mass.size,
+                label = "итерации"
+            ) {
+                iterationAverage(mass, mass.size)
+            }
 
-        println()
-
-        var sumR = 0L
-        println("время через рекурсию")
-        for (i in 1..mass.size){
-            val endTime = System.nanoTime()
-            val result = averageRecursive(mass, mass.size)
-            val recursTime = (endTime - startTime) / 1_000_000     // мс
-            sumR += recursTime
-            println("Итерация $i: ${recursTime}мс, среднее арифметическое =${result}")
+            println()
+            println("рекурсия: $timeRecursive мс")
+            println("итерации: $timeIterative мс")
         }
 
-        var sumI = 0L
+        2 -> {
 
-        println()
+            // Используем функцию из библиотеки вместо ручного создания массива
+            // generateRandomArray(size, min, max, seed?)
+            val mass = generateRandomArray(
+                size = 1000,    // размер массива
+                min = 0,        // минимальное значение (включительно)
+                max = 100,      // максимальное значение (исключительно)
+                seed = null     // null = случайный seed, можно задать число для воспроизводимости
+            )
 
-        println("время через итерации")
-        for (i in 1..mass.size){
-            val endTime = System.nanoTime()
-            val result = iterationAverage(mass, mass.size)
-            val iterTime = (endTime - startTime) / 1_000_000     // мс
-            sumI += iterTime
-            println("Итерация $i: ${iterTime}мс, среднее арифметическое =${result}")
+            println("Целые числа: ${mass.joinToString()}")
+
+            val resRecursive = averageRecursive(mass, mass.size)
+            println("Среднее арифметическое: $resRecursive")
+
+            val resIterative = iterationAverage(mass, mass.size)
+            println("Среднее арифметическое через сумму: $resIterative")
+
+            println()
+
+            // Замер рекурсивного выполнения
+            val timeRecursive = measureExecutionTime(
+                iterations = mass.size,
+                label = "рекурсию"
+            ) {
+                averageRecursive(mass, mass.size)
+            }
+
+            println()
+
+            // Замер итеративной версии
+            val timeIterative = measureExecutionTime(
+                iterations = mass.size,
+                label = "итерации"
+            ) {
+                iterationAverage(mass, mass.size)
+            }
+
+            println()
+            println("рекурсия: $timeRecursive мс")
+            println("итерации: $timeIterative мс")
         }
 
-        println()
+        3 -> {
 
-        println("рекурсия: $sumR мс")
-        println("итерации: $sumI мс")
+            // Для замера глубины рекурсии тоже используем библиотеку
+            val mass = generateRandomArray(size = 20, min = 0, max = 100)
+            println("Целые числа: ${mass.joinToString()}")
 
-    } else if (qest == 2){
-
-        val mass = IntArray(1000) { Random.nextInt(100) }
-        println("Целые числа: ${mass.joinToString()}")
-
-        val res = averageRecursive(mass, mass.size)
-        println("Среднее арифметическое: $res")
-
-        val resAverage = iterationAverage(mass, mass.size)
-        println("Среднее арифметическое через сумму: $resAverage")
-
-        println()
-
-        // возвращает текущее врнемя системы в наносекундах
-        val startTime = System.nanoTime()
-
-        var sumR = 0L
-        // блок вычисления времени выполнения программы разными методами
-        println("время через рекурсию")
-        for (i in 1..mass.size){
-            val endTime = System.nanoTime()
-            val result = averageRecursive(mass, mass.size)
-            val recursTime = (endTime - startTime) / 1_000_000     // мс
-            sumR += recursTime
-            println("Итерация $i: ${recursTime}мс, среднее арифметическое =${result}")
+            val depth = measureRecursionDepth(mass, mass.size)
+            println("Глубина рекурсии: $depth")
         }
 
-        println()
-
-        var sumI = 0L
-
-        println("время через итерации")
-        for (i in 1..mass.size){
-            val endTime = System.nanoTime()
-            val result = iterationAverage(mass, mass.size)
-            val iterTime = (endTime - startTime) / 1_000_000     // мс
-            sumI += iterTime
-            println("Итерация $i: ${iterTime}мс, среднее арифметическое =${result}")
-        }
-
-        println()
-
-        println("рекурсия: $sumR мс")
-        println("итерации: $sumI мс")
-    } else if (qest == 3){
-
-        val mass = IntArray(20) { Random.nextInt(100) }
-        println("Целые числа: ${mass.joinToString()}")
-
-        // Измерение глубины рекурсии
-        val depth = measureRecursionDepth(mass, mass.size)
-        println("Глубина рекурсии: $depth")
-
+        else -> println("Неверный выбор")
     }
-
-
 }

@@ -1,6 +1,10 @@
-// рекурсивная вспомогательная функиця для вычисления среднего арифмечтисеского чисел в массиве
+/**
+ * рекурсивная вспомогательная функиця для вычисления среднего арифмечтисеского чисел в массиве
+ * @param numbers - массив из Int
+ * @param n - размер массива
+ * @return сумму через рекурсию
+ */
 fun recursSum(numbers: IntArray, n: Int): Double {
-
     // база рекурсии (при котором рекурсия завершается) n = 0
     // if (n <= 0) - терминальная ветвь
     if (n <= 0) return 0.0
@@ -9,15 +13,25 @@ fun recursSum(numbers: IntArray, n: Int): Double {
     return numbers[n - 1].toDouble() + recursSum(numbers, n - 1)
 }
 
-// вспомогатеьная функция для вычисления среднего арифмечтисеского чисел в массиве
+/**
+ * вспомогатеьная функция для вычисления среднего арифмечтисеского чисел в массиве
+ * @param numbers массив
+ * @param n размер массва
+ * @return среднее арифметичсекое
+ */
 fun averageRecursive(numbers: IntArray, n: Int): Double {
     require(n > 0) { "n должно быть больше 0" }
     require(n <= numbers.size) { "n не может превышать размер массива" }
     return recursSum(numbers, n) / n
 }
 
-// функция для вычисленяи среднего арифмечтисеского чисел в массиве яерез итерации
-fun iterationAverage(numbers: IntArray, n: Int): Double{
+/**
+ * функция для вычисленяи среднего арифмечтисеского чисел в массиве яерез итерации
+ * @param numbers массив
+ * @param n размер
+ * @return среднее арифметичсекое элементов в массиве
+ */
+fun iterationAverage(numbers: IntArray, n: Int): Double {
     require(n > 0) { "n должно быть больше 0" }
     require(n <= numbers.size) { "n не может превышать размер массива" }
 
@@ -28,8 +42,11 @@ fun iterationAverage(numbers: IntArray, n: Int): Double{
     return sum / n
 }
 
-// ручное заполнение массвиа
-fun manualArr(): IntArray{
+/**
+ * ручное заполнение массвиа
+ * @return IntArray
+ */
+fun manualArr(): IntArray {
     print("Введите размер массива: ")
 
     // проверка на null
@@ -45,19 +62,21 @@ fun manualArr(): IntArray{
 
     for (i in 0 until size) {
         print("Введите элемент [$i]: ")
-
-        array[i] = readLine()?.toIntOrNull()?: 0
+        array[i] = readLine()?.toIntOrNull() ?: 0
     }
     return array
 }
 
-/*
-* Глубина всегда равна значению параметра n, так как каждый рекурсивный вызов уменьшает n на 1 до достижения базового случая (n <= 0).
-*/
-
-// Вспомогательная рекурсивная функция для подсчёта глубины
+/**
+ * Вспомогательная рекурсивная функция для подсчёта глубины рекурсии
+ * Глубина всегда равна значению параметра n, так как каждый рекурсивный вызов уменьшает n на 1 до
+ * достижения базового случая (n <= 0).
+ * @param numbers - массив на вход
+ * @param n - количество элементов в массивк
+ * @param currentDepth - текущая глубина вычислений
+ * @return Int
+ */
 private fun measureDepthHelper(numbers: IntArray, n: Int, currentDepth: Int): Int {
-
     // Базовый случай: возвращаем текущую глубину
     if (n <= 0) return currentDepth
 
@@ -65,7 +84,12 @@ private fun measureDepthHelper(numbers: IntArray, n: Int, currentDepth: Int): In
     return measureDepthHelper(numbers, n - 1, currentDepth + 1)
 }
 
-// Функция для измерения глубины рекурсии
+/**
+ * Функция для измерения глубины рекурсии
+ * @param numbers - массив на вход
+ * @param n - кол-во элмеентов в массиве
+ * @return Int
+ */
 fun measureRecursionDepth(numbers: IntArray, n: Int): Int {
     require(n > 0) { "n должно быть больше 0" }
     require(n <= numbers.size) { "n не может превышать размер массива" }
