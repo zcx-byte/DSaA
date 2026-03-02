@@ -1,5 +1,4 @@
-import kotlin.random.Random
-import com.TimeUtils.utils.*
+import com.timeutils.utils.*
 
 fun main() {
     val menuText = """
@@ -17,14 +16,14 @@ fun main() {
             val mass = manualArr()
             println("Целые числа: ${mass.joinToString()}")
 
+            saveArrayToFile(mass, "save.txt", ", ")
+
             // Выполнение расчётов для вывода результатов
             val resRecursive = averageRecursive(mass, mass.size)
             println("Среднее арифметическое через рекурсию: $resRecursive")
 
             val resIterative = iterationAverage(mass, mass.size)
             println("Среднее арифметическое через сумму: $resIterative")
-
-            println()
 
             // Замер рекурсивного выполнения
             val timeRecursive = measureExecutionTime(
@@ -34,8 +33,6 @@ fun main() {
                 averageRecursive(mass, mass.size)
             }
 
-            println()
-
             // Замер итеративной версии
             val timeIterative = measureExecutionTime(
                 iterations = mass.size,
@@ -44,9 +41,8 @@ fun main() {
                 iterationAverage(mass, mass.size)
             }
 
-            println()
-            println("рекурсия: $timeRecursive мс")
-            println("итерации: $timeIterative мс")
+            println("рекурсия: ${timeRecursive/1_000_000.0} мс")
+            println("итерации: ${timeIterative/1_000_000.0} мс")
         }
 
         2 -> {
@@ -54,11 +50,13 @@ fun main() {
             // Используем функцию из библиотеки вместо ручного создания массива
             // generateRandomArray(size, min, max, seed?)
             val mass = generateRandomArray(
-                size = 1000,    // размер массива
-                min = 0,        // минимальное значение (включительно)
-                max = 100,      // максимальное значение (исключительно)
+                size = 50,    // размер массива
+                min = 10,        // минимальное значение (включительно)
+                max = 1000,      // максимальное значение (исключительно)
                 seed = null     // null = случайный seed, можно задать число для воспроизводимости
             )
+
+            saveArrayToFile(mass, "save.txt", ", ", false)
 
             println("Целые числа: ${mass.joinToString()}")
 
@@ -68,7 +66,8 @@ fun main() {
             val resIterative = iterationAverage(mass, mass.size)
             println("Среднее арифметическое через сумму: $resIterative")
 
-            println()
+            val sort = sortArrayInPlace(mass)
+            println("отсортированный массив (монотонное возрастание): ${sort.joinToString()}")
 
             // Замер рекурсивного выполнения
             val timeRecursive = measureExecutionTime(
@@ -78,8 +77,6 @@ fun main() {
                 averageRecursive(mass, mass.size)
             }
 
-            println()
-
             // Замер итеративной версии
             val timeIterative = measureExecutionTime(
                 iterations = mass.size,
@@ -88,9 +85,8 @@ fun main() {
                 iterationAverage(mass, mass.size)
             }
 
-            println()
-            println("рекурсия: $timeRecursive мс")
-            println("итерации: $timeIterative мс")
+            println("рекурсия: ${timeRecursive/1_000_000.0} мс")
+            println("итерации: ${timeIterative/1_000_000.0} мс")
         }
 
         3 -> {
@@ -105,4 +101,7 @@ fun main() {
 
         else -> println("Неверный выбор")
     }
+
+
+
 }
