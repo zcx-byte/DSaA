@@ -5,7 +5,7 @@
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.TimeUtils.utils</groupId>
+    <groupId>com.timeutils.utils</groupId>
     <artifactId>time-utils</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
@@ -21,10 +21,19 @@
     </properties>
 
     <dependencies>
+        <!-- Kotlin стандартная библиотека -->
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>
             <version>${kotlin.version}</version>
+        </dependency>
+
+        <!-- JUnit 5 -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.10.0</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -33,6 +42,7 @@
         <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
 
         <plugins>
+            <!-- Kotlin плагин -->
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
@@ -55,6 +65,7 @@
                 </executions>
             </plugin>
 
+            <!-- Java компилятор -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -68,6 +79,13 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+
+            <!-- ✅ Surefire плагин для запуска JUnit 5 тестов -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.2</version>
             </plugin>
         </plugins>
     </build>
