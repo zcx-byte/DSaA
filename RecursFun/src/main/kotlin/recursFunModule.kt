@@ -1,8 +1,9 @@
 /**
- * рекурсивная вспомогательная функиця для вычисления среднего арифмечтисеского чисел в массиве
- * @param numbers - массив из Int
+ * Recurs sum
+ *
+ * @param numbers - массив на вход
  * @param n - размер массива
- * @return сумму через рекурсию
+ * @return рекукрсивная фнукция
  */
 fun recursSum(numbers: IntArray, n: Int): Double {
     // база рекурсии (при котором рекурсия завершается) n = 0
@@ -36,7 +37,7 @@ fun iterationAverage(numbers: IntArray, n: Int): Double {
     require(n <= numbers.size) { "n не может превышать размер массива" }
 
     var sum = 0.0
-    for(i in 0 .. numbers.size - 1){
+    for (i in 0..numbers.size - 1) {
         sum += numbers[i]
     }
     return sum / n
