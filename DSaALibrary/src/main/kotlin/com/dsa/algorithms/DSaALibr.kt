@@ -1,4 +1,4 @@
-package com.timeutils.utils
+package com.dsa.algorithms
 
 import java.io.File
 import java.io.FileOutputStream
@@ -17,14 +17,17 @@ import kotlin.random.Random
 fun <T> measureExecutionTime(
     iterations: Int,
     label: String,
+
+    // имеет функционалльный тип данных (подойдёт, которая возвращает тип Т)
     operation: () -> T
+
 ): Long {
 
     // sumOf проходит по диапазону, выполняет operation и суммирует время каждой итерации
     return (1..iterations).sumOf {
-        val start = System.nanoTime()     // замер "до"
+        val start = System.nanoTime()     // замер до
         operation()                     // выполнение кода
-        System.nanoTime() - start       // замер "после" и вычисление разницы
+        System.nanoTime() - start       // замер после и вычисление разницы
     }
 }
 
@@ -43,10 +46,12 @@ fun generateRandomArray(
     max: Int = 1000,
     seed: Long? = null
 ): IntArray {
+
     require(size >= 0) { "Размер массива не может быть отрицательным" }
     require(min < max) { "min должен быть меньше max" }
 
     // Если seed передан — используем его для воспроизводимости, иначе — случайный
+    // ?: - или иначе
     val random = seed?.let { Random(it) } ?: Random
 
     // Конструктор IntArray с лямбдой создаёт и заполняет массив за один проход
@@ -68,6 +73,7 @@ fun fillArrayWithRandom(
     max: Int = 1000,
     seed: Long? = null
 ): IntArray {
+
     require(min < max) { "min должен быть меньше max" }
 
     val random = seed?.let { Random(it) } ?: Random
@@ -192,10 +198,33 @@ fun sortArrayInPlace(array: IntArray): IntArray {
  * @return true если массив отсортирован по неубыванию
  */
 fun isArraySortedAscending(array: IntArray): Boolean {
+
     // Проверяем каждый элемент со следующим
     // Если хотя бы один элемент больше следующего — массив не отсортирован
     for (i in 0 until array.lastIndex) {
         if (array[i] > array[i + 1]) return false
     }
     return true
+}
+
+/**
+ * Find line element
+ *
+ * @param array - массив на вход
+ * @param target - число, которое нужно найти
+ * @return индекс числа в массиве, если оно найдено, иначе -1
+ */
+fun findLineElement(array: IntArray, target: Int ): Int{
+
+    for (i in array.indices){
+
+        if (target == array[i]) {
+
+            println("Цель найдена, индекс числа в массие: $i")
+            return i
+        }
+    }
+
+    println("Данного числа ($target) в массиве нет")
+    return -1
 }

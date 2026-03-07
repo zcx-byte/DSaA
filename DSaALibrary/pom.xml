@@ -5,13 +5,13 @@
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.timeutils.utils</groupId>
-    <artifactId>time-utils</artifactId>
+    <groupId>com.dsa</groupId>
+    <artifactId>dsa-library</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>Time Utils</name>
-    <description>Utility library for measuring execution time</description>
+    <name>DSA Library</name>
+    <description>Utility library for algorithms, data structures and array operations</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
