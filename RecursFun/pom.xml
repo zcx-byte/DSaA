@@ -67,8 +67,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.TimeUtils.utils</groupId>
-            <artifactId>time-utils</artifactId>
+            <groupId>com.dsa</groupId>
+            <artifactId>dsa-library</artifactId>
             <version>1.0.0</version>
         </dependency>
         <dependency>
