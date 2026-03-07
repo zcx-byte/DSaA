@@ -14,6 +14,7 @@ fun main() {
     when (choice) {
         1 -> {
             val mass = manualArr()
+
             println("Целые числа: ${mass.joinToString()}")
 
             saveArrayToFile(mass, "save.txt", ", ")
@@ -28,21 +29,21 @@ fun main() {
             // Замер рекурсивного выполнения
             val timeRecursive = measureExecutionTime(
                 iterations = mass.size,
-                label = "рекурсию"
-            ) {
-                averageRecursive(mass, mass.size)
-            }
+                label = "рекурсию",
+                operation = {
+                    averageRecursive(mass, mass.size)
+                }
+            )
 
             // Замер итеративной версии
             val timeIterative = measureExecutionTime(
                 iterations = mass.size,
-                label = "итерации"
-            ) {
-                iterationAverage(mass, mass.size)
-            }
+                label = "итерации",
+                operation = { iterationAverage(mass, mass.size) }
+            )
 
-            println("рекурсия: ${timeRecursive/1_000_000.0} мс")
-            println("итерации: ${timeIterative/1_000_000.0} мс")
+            println("рекурсия: ${timeRecursive / 1_000_000.0} мс")
+            println("итерации: ${timeIterative / 1_000_000.0} мс")
         }
 
         2 -> {
@@ -50,9 +51,9 @@ fun main() {
             // Используем функцию из библиотеки вместо ручного создания массива
             // generateRandomArray(size, min, max, seed?)
             val mass = generateRandomArray(
-                size = 50,    // размер массива
+                size = 16_000,    // размер массива
                 min = 10,        // минимальное значение (включительно)
-                max = 1000,      // максимальное значение (исключительно)
+                max = 10_000,      // максимальное значение (исключительно)
                 seed = null     // null = случайный seed, можно задать число для воспроизводимости
             )
 
@@ -70,6 +71,8 @@ fun main() {
             println("отсортированный массив (монотонное возрастание): ${sort.joinToString()}")
 
             // Замер рекурсивного выполнения
+            // -Xss - задание в кб размера стека
+            // рекурсия будет медленне, потому что она тратит доп. время на вызов самой себя
             val timeRecursive = measureExecutionTime(
                 iterations = mass.size,
                 label = "рекурсию"
@@ -80,13 +83,16 @@ fun main() {
             // Замер итеративной версии
             val timeIterative = measureExecutionTime(
                 iterations = mass.size,
-                label = "итерации"
-            ) {
-                iterationAverage(mass, mass.size)
-            }
+                label = "итерации",
 
-            println("рекурсия: ${timeRecursive/1_000_000.0} мс")
-            println("итерации: ${timeIterative/1_000_000.0} мс")
+                // передаётся лямбда-функция без аругемнтов
+                operation = {
+                    iterationAverage(mass, mass.size)
+                }
+            )
+
+            println("рекурсия: ${timeRecursive / 1_000_000.0} мс")
+            println("итерации: ${timeIterative / 1_000_000.0} мс")
         }
 
         3 -> {
