@@ -1,4 +1,4 @@
-import com.timeutils.utils.*
+import com.dsa.algorithms.*
 
 fun main() {
     val menuText = """

@@ -176,18 +176,36 @@ fun loadArrayFromFile(
  * @return новая отсортированная копия массива
  */
 fun sortArrayAscending(array: IntArray): IntArray {
+
     // copyOf() создаёт копию, apply { sort() } сортирует её на месте и возвращает
     return array.copyOf().apply { sort() }
 }
 
 /**
- * Сортирует массив по возрастанию на месте (изменяет исходный массив).
+ * Сортирует массив по возрастанию на месте.
  *
  * @param array массив для сортировки
  * @return тот же массив, отсортированный по возрастанию
  */
 fun sortArrayInPlace(array: IntArray): IntArray {
-    array.sort()
+    val n = array.size
+
+    // Внешний цикл — количество проходов
+    for (i in 0 until n - 1) {
+
+        // Внутренний цикл — сравнение соседних элементов
+        for (j in 0 until n - 1 - i) {
+
+            // Если текущий элемент больше следующего — меняем их местами
+            if (array[j] > array[j + 1]) {
+
+                // Обмен значений
+                val temp = array[j]
+                array[j] = array[j + 1]
+                array[j + 1] = temp
+            }
+        }
+    }
     return array
 }
 
@@ -208,11 +226,15 @@ fun isArraySortedAscending(array: IntArray): Boolean {
 }
 
 /**
- * Find line element
+ * Линейный поиск элемента в массиве.
+ * Последовательно проверяет каждый элемент до нахождения совпадения. Сложность O(n).
  *
- * @param array - массив на вход
- * @param target - число, которое нужно найти
- * @return индекс числа в массиве, если оно найдено, иначе -1
+ * Использовать, когда: массив не отсортирован, очень маленький (< 20 элементов) или поиск однократный.
+ * Не использовать, когда: массив большой и отсортирован (лучше [binarySearch] или [interpolationSearch]).
+ *
+ * @param array массив для поиска (может быть неотсортированным)
+ * @param target искомое значение
+ * @return индекс элемента или -1 если не найден
  */
 fun findLineElement(array: IntArray, target: Int ): Int{
 
@@ -220,11 +242,114 @@ fun findLineElement(array: IntArray, target: Int ): Int{
 
         if (target == array[i]) {
 
-            println("Цель найдена, индекс числа в массие: $i")
+            println("Цель ($target) найдена, индекс числа в массие: $i")
+
             return i
         }
     }
 
     println("Данного числа ($target) в массиве нет")
     return -1
+}
+
+/**
+ * Бинарный поиск элемента в отсортированном массиве.
+ * На каждом шаге отбрасывает половину диапазона, обеспечивая сложность O(log n).
+ *
+ * Использовать, когда: массив отсортирован, распределение данных неизвестно или неравномерное.
+ * Не использовать, когда: массив не отсортирован (лучше [findLineElement]) или данные равномерно распределены (лучше [interpolationSearch]).
+ *
+ * @param array отсортированный по возрастанию массив
+ * @param target искомое значение
+ * @return индекс элемента или -1 если не найден
+ */
+fun binarySearch(array: IntArray, target: Int): Int {
+
+    var left = 0
+    var right = array.size - 1
+
+    while (left <= right) {
+
+        // Вычисляем середину
+        val mid = left + (right - left) / 2
+
+        when {
+            array[mid] == target -> return mid
+            array[mid] < target -> left = mid + 1   // Ищем справа
+            else -> right = mid - 1                 // Ищем слева
+        }
+    }
+    return -1
+}
+
+/**
+ * Интерполяционный поиск элемента в отсортированном массиве.
+ * Работает эффективно только при равномерном распределении данных.
+ *
+ * @param array отсортированный массив
+ * @param target искомое значение
+ * @return индекс элемента или -1 если не найден
+ */
+fun interpolationSearch(array: IntArray, target: Int): Int {
+    var left = 0
+    var right = array.size - 1
+
+    while (left <= right && target >= array[left] && target <= array[right]) {
+
+        // Защита от деления на ноль
+        if (array[right] == array[left]) {
+            if (array[left] == target) return left
+            break
+        }
+
+        // Формула интерполяции
+        val pos = left + ((target - array[left]) * (right - left)) /
+                (array[right] - array[left])
+
+        // Проверка границ (на случай выхода за пределы)
+        if (pos < left || pos > right) break
+
+        when {
+            array[pos] == target -> return pos
+            array[pos] < target -> left = pos + 1
+            else -> right = pos - 1
+        }
+    }
+
+    return -1
+}
+
+/**
+ * Линейный поиск первого элемента, удовлетворяющего условию (предикату).
+ *
+ * Последовательно проверяет каждый элемент массива, передавая его в функцию [predicate].
+ * Возвращает первый элемент, для которого предикат вернул true.
+ *
+ * ## Сложность:
+ * - Время: **O(n)** — в худшем случае проверяются все элементы
+ * - Память: **O(1)** — не требует дополнительной памяти
+ *
+ * ## Когда использовать:
+ * - стоит, коглда нужен поиск по **сложному условию** (не просто сравнение с значением)
+ * - когда Массив **не отсортирован**
+ * - стоит, когда нужно найти **первый подходящий** элемент
+ * - Не стоит для простого поиска по значению — используйте [binarySearch] или [findLineElement]
+ *
+ * @param T тип элементов массива
+ * @param array массив для поиска
+ * @param predicate функция-условие, принимающая элемент и возвращающая true/false
+ * @return первый элемент, удовлетворяющий условию, или null если ничего не найдено
+ *
+ * @sample
+ * val numbers = intArrayOf(1, 5, 12, 8, 20)
+ * val firstEven = findByPredicate(numbers) { it % 2 == 0 }  // 12
+ * val firstLarge = findByPredicate(numbers) { it > 15 }     // 20
+ */
+fun <T> findByPredicate(array: Array<T>, predicate: (T) -> Boolean): T? {
+    for (element in array) {
+        if (predicate(element)) {
+            return element
+        }
+    }
+    return null
 }
