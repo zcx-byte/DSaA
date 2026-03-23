@@ -7,13 +7,13 @@
 import com.dsa.algorithms.*     // подключаем мою библиотеку
 
 /**
- * Возвращает случайный элемент из массива целых чисел.
+ * Возвращает случайный элемент из массива целых чисел типа Long.
  *
  * @param array массив, из которого извлекается элемент
  * @return случайное значение из массива
  * @throws IllegalArgumentException если массив пустой
  */
-fun randomElement(array: IntArray): Int {
+fun randomElement(array: LongArray): Long {
     require(array.isNotEmpty()) { "Нельзя получить элемент из пустого массива" }
     return array[kotlin.random.Random.nextInt(0, array.size)]
 }
@@ -21,102 +21,127 @@ fun randomElement(array: IntArray): Int {
 fun main() {
 
     val array = generateRandomArray(
-        size = 30,
-        min = 0,
-        max = 30
+        size = 1_000_000,
+        min = 1L,
+        max = 30_00L
     )
 
     println("исходный не отсортированный массив: ${array.joinToString()}")
 
-    // сортируем массив (по возрастанию, для бинарного поиска)
-    val sortArr = sortArrayAscending(array)
+    // Создаём компаратор для типа Long (необходим для обобщённых функций)
+    // a, b - переопределение класса Compare -> a.compareTo(b) - возвращение
+    // передаём а, b и гворим, что нам а нужно сравнить с b и верунть Int
+    // почему Int - потому что Int самый минимальный и достаточный тмип для сравнения чисел
+    //
+    val longComparator = Comparator<Long> { a, b -> a.compareTo(b) }
 
-    println("отсортироанная копия массива: ${sortArr.joinToString()}")
+    // Сортируем массив (по возрастанию, для бинарного поиска)
+    // sortArrayAscending теперь принимает Array<T> и Comparator
+    val sortArr = sortArrayAscending(array.toTypedArray(), longComparator)
+
+    println("отсортированная копия массива: ${sortArr.joinToString()}")
 
     val target = randomElement(array)
 
     /**
-     * Лучший случай O(1)
-     * Средний случай O(n)
-     * Худший случай O(n)
-     * Требования нет
+     * Линейный поиск
+     * ## Сложность:
+     * - Лучший случай: **O(1)**
+     * - Средний случай: **O(n)**
+     * - Худший случай: **O(n)**
+     * - Требования: нет
      */
-    findLineElement(array, target)
+    // findLineElement теперь принимает Array<T>, target: T и Comparator
+    val resL = findLineElement(array.toTypedArray(), target, longComparator)
 
-    /**
-     * Лучший случай O(1)
-     * Средний случай O(log n)
-     * Худший случай O(log n)
-     * Требования Отсортированный массив
-     */
-    val result = binarySearch(sortArr, target)
-
-    if (result != -1){
-        println("Бинарный: Цель ($target) найдена на позиции $result")
-    } else{
-        println("Такого числа ($target) в массиве нету")
+    if (resL != -1) {
+        println("Линейный: цель ($target) найдена на позиции $resL")
+    } else {
+        println("Такого числа ($target) в массиве нет")
     }
 
     /**
-     * Интерполяционный
-     * O(1) - Лучший случай
-     * O(log log n) - средний случай
-     * O(n) - худший случай
+     * Бинарный поиск
+     * ## Сложность:
+     * - Лучший случай: **O(1)**
+     * - Средний случай: **O(log n)**
+     * - Худший случай: **O(log n)**
+     * - Требования: отсортированный массив
      */
-    val resultInterp = interpolationSearch(sortArr, target)
+    val result = binarySearch(sortArr, target, longComparator)
 
-    if (resultInterp != -1){
-        println("Интерполяционный: Цель ($target) найдена на позиции $resultInterp")
-    } else{
-        println("Такого числа ($target) в массиве нету")
+    if (result != -1) {
+        println("Бинарный: цель ($target) найдена на позиции $result")
+    } else {
+        println("Такого числа ($target) в массиве нет")
     }
 
+    /**
+     * Интерполяционный поиск
+     * ## Сложность:
+     * - Лучший случай: **O(1)**
+     * - Средний случай: **O(log log n)** (при равномерном распределении)
+     * - Худший случай: **O(n)**
+     * - Требования: отсортированный массив + равномерное распределение
+     */
+    // Функция преобразования Long -> Double для расчёта интерполяции
+    val toDouble: (Long) -> Double = { it.toDouble() }
+    val resultInterp = interpolationSearch(sortArr, target, longComparator, toDouble)
 
+    if (resultInterp != -1) {
+        println("Интерполяционный: цель ($target) найдена на позиции $resultInterp")
+    } else {
+        println("Такого числа ($target) в массиве нет")
+    }
+
+    // Преобразуем LongArray в Array<Long> для работы с findByPredicate
     val boxedArray = array.toTypedArray()
 
-    val resultPred = findByPredicate(boxedArray) { it % 2 == 0 }
-    println("Первое чётное число в не остортированном массиве: $resultPred")
+    // it — неявно указанный параметр, обозначает "этот элемент"
+    // Обратите внимание: 0L вместо 0, так как элементы имеют тип Long
+    val resultPred = findByPredicate(boxedArray) { it % 2 == 0L }
+    println("Первое чётное число в не отсортированном массиве: $resultPred")
 
     println()
-    println("=====время поиска=======")
+    println("===== время поиска =======")
 
     val timeL = measureExecutionTime(
         iterations = array.size,
         label = "Линейный поиск",
-        operation = { findLineElement(array, target) }
+        operation = { findLineElement(array.toTypedArray(), target, longComparator) }
     )
 
     val timeB = measureExecutionTime(
         iterations = array.size,
         label = "Бинарный поиск",
-        operation = { binarySearch(array, target) }
-
+        operation = { binarySearch(sortArr, target, longComparator) }
     )
 
-    val timeinter = measureExecutionTime(
+    val timeInterp = measureExecutionTime(
         iterations = array.size,
-        label = "интерполяционный поиск",
-        operation = { interpolationSearch(sortArr, target) }
-
+        label = "Интерполяционный поиск",
+        operation = { interpolationSearch(sortArr, target, longComparator, toDouble) }
     )
 
     val timePred = measureExecutionTime(
         iterations = array.size,
-        label = "интерполяционный поиск",
-        operation = { findByPredicate(boxedArray) { it % 2 == 0 } }
-
+        label = "Предикатный поиск",
+        operation = { findByPredicate(boxedArray) { it % 2 == 0L } }
     )
 
     /**
-     * вывод: Бинарный поиск всегда быстрее линейного, потомучто после певрой "интерации" он отбрасывет сразу половину значенйи
-     *        Интерполяционный поиск может быть быстрее бинарного, когда:
-     *        Данные отсортированы И распределены равномерно (10, 20, 30 и т.д.)
-     *        Интерполяционный споссю лучше использовать, когда в массиве огромное кол-во элементов
+     * Вывод:
+     * - Бинарный поиск всегда быстрее линейного, потому что после первой итерации
+     *   он отбрасывает сразу половину значений.
+     * - Интерполяционный поиск может быть быстрее бинарного, когда:
+     *   1. Данные отсортированы
+     *   2. Распределены равномерно (10, 20, 30 и т.д.)
+     * - Интерполяционный способ лучше использовать, когда в массиве огромное
+     *   количество элементов и выполнено условие равномерности.
      */
 
     println("Линейный: ${timeL / 1_000_000.0} мс")
     println("Бинарный: ${timeB / 1_000_000.0} мс")
-    println("Интерполяционный: ${timeinter / 1_000_000.0} мс")
+    println("Интерполяционный: ${timeInterp / 1_000_000.0} мс")
     println("Предикатный: ${timePred / 1_000_000.0} мс")
-
 }
