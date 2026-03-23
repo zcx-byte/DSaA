@@ -1,3 +1,5 @@
+// Автор: Прасков Д.Е. Студент 2-го курса ЗабГУ ИВТ-24
+
 package com.dsa.algorithms
 
 import java.io.File
@@ -17,19 +19,18 @@ import kotlin.random.Random
 fun <T> measureExecutionTime(
     iterations: Int,
     label: String,
-
-    // имеет функционалльный тип данных (подойдёт, которая возвращает тип Т)
     operation: () -> T
-
 ): Long {
-
-    // sumOf проходит по диапазону, выполняет operation и суммирует время каждой итерации
     return (1..iterations).sumOf {
-        val start = System.nanoTime()     // замер до
-        operation()                     // выполнение кода
-        System.nanoTime() - start       // замер после и вычисление разницы
+        val start = System.nanoTime()
+        operation()
+        System.nanoTime() - start
     }
 }
+
+// ================= ЧИСЛОВЫЕ ФУНКЦИИ (LongArray) =================
+// Эти функции требуют арифметических операций или специфичного парсинга,
+// поэтому оставлены для типа LongArray.
 
 /**
  * Заполняет массив случайными числами в заданном диапазоне.
@@ -38,24 +39,19 @@ fun <T> measureExecutionTime(
  * @param min минимальное значение (включительно)
  * @param max максимальное значение (исключительно)
  * @param seed опциональное зерно для генератора (для воспроизводимости)
- * @return новый массив IntArray со случайными значениями
+ * @return новый массив LongArray со случайными значениями
  */
 fun generateRandomArray(
     size: Int,
-    min: Int = 0,
-    max: Int = 1000,
+    min: Long = 0,
+    max: Long = 1000,
     seed: Long? = null
-): IntArray {
-
+): LongArray {
     require(size >= 0) { "Размер массива не может быть отрицательным" }
     require(min < max) { "min должен быть меньше max" }
 
-    // Если seed передан — используем его для воспроизводимости, иначе — случайный
-    // ?: - или иначе
     val random = seed?.let { Random(it) } ?: Random
-
-    // Конструктор IntArray с лямбдой создаёт и заполняет массив за один проход
-    return IntArray(size) { random.nextInt(min, max) }
+    return LongArray(size) { random.nextLong(min, max) }
 }
 
 /**
@@ -68,25 +64,21 @@ fun generateRandomArray(
  * @return тот же массив (для поддержки цепочки вызовов)
  */
 fun fillArrayWithRandom(
-    array: IntArray,
-    min: Int = 0,
-    max: Int = 1000,
+    array: LongArray,
+    min: Long = 0,
+    max: Long = 1000,
     seed: Long? = null
-): IntArray {
-
+): LongArray {
     require(min < max) { "min должен быть меньше max" }
-
     val random = seed?.let { Random(it) } ?: Random
-
-    // Заполняем массив по индексу
     for (i in array.indices) {
-        array[i] = random.nextInt(min, max)
+        array[i] = random.nextLong(min, max)
     }
     return array
 }
 
 /**
- * Сохраняет массив целых чисел в текстовый файл.
+ * Сохраняет массив целых чисел типа Long в текстовый файл.
  *
  * @param array массив для сохранения
  * @param filePath путь к файлу
@@ -95,111 +87,76 @@ fun fillArrayWithRandom(
  * @return true если успешно, false при ошибке
  */
 fun saveArrayToFile(
-    array: IntArray,
+    array: LongArray,
     filePath: String,
-    delimiter: String = " ",    // Значение по умолчанию: если не передать аргумент, будет пробел
-    append: Boolean = false     // Значение по умолчанию: если не передать, файл будет перезаписан
+    delimiter: String = " ",
+    append: Boolean = false
 ): Boolean {
-
-    // Блок try позволяет "поймать" ошибку, если она возникнет при работе с файлом,
-    // и предотвратить аварийное завершение программы.
     return try {
-
-        // 1. Создаем поток для записи байтов в файл (FileOutputStream).
-        // Параметры: путь к файлу и флаг 'append' (режим дозаписи).
-        // .use { ... } — гарантирует, что файл будет автоматически и корректно закрыт
-        // сразу после выполнения кода внутри фигурных скобок, даже если случится ошибка.
-        // Это защищает от утечки ресурсов.
         FileOutputStream(filePath, append).use { fos ->
-
-            // 2. Оборачиваем байтовый поток в писатель символов (OutputStreamWriter).
-            // Это нужно, чтобы записывать не просто байты, а текст (строки).
-            // Charsets.UTF_8 — указываем кодировку, чтобы кириллица и спецсимволы
-            // отображались корректно на любом устройстве.
-            // Вложенный .use гарантирует закрытие и этого ресурса.
             OutputStreamWriter(fos, Charsets.UTF_8).use { writer ->
-
-                // 3. Подготавливаем данные и записываем их в файл.
-                // array.joinToString(delimiter) — превращает массив [1, 2, 3] в строку "1 2 3"
-                // writer.write(...) — физически записывает полученную строку в файл.
                 writer.write(array.joinToString(delimiter))
-
             }
         }
-
-        // Если код выполнился без ошибок, возвращаем true.
         true
-
     } catch (e: Exception) {
-
-        // Блок catch срабатывает, если в блоке try произошла ЛЮБАЯ ошибка
-        // (например, нет прав на запись, диск переполнен, путь неверный).
-        // В данном примере мы просто "глотаем" ошибку и возвращаем false,
-        // чтобы программа могла продолжить работу.
-        // Для отладки сюда можно добавить e.printStackTrace()
         false
     }
 }
 
 /**
- * Загружает массив целых чисел из текстового файла.
+ * Загружает массив целых чисел типа Long из текстового файла.
  *
  * @param filePath путь к файлу
  * @param delimiter разделитель (должен совпадать с тем, что при сохранении)
- * @return массив с данными или пустой массив при ошибке/отсутствии данных
+ * @return массив с данными типа LongArray или пустой массив при ошибке/отсутствии данных
  */
 fun loadArrayFromFile(
     filePath: String,
     delimiter: String = " "
-): IntArray {
+): LongArray {
     return try {
         val content = File(filePath).readText(Charsets.UTF_8).trim()
-
-        if (content.isEmpty()) return IntArray(0)
-
-        // Цепочка: разбиение строки -> фильтрация пустот -> парсинг в Int -> массив
+        if (content.isEmpty()) return LongArray(0)
         content.split(delimiter)
             .filter { it.isNotBlank() }
-            .map { it.toInt() }
-            .toIntArray()
-
+            .map { it.toLong() }
+            .toLongArray()
     } catch (e: Exception) {
-        IntArray(0)
+        LongArray(0)
     }
 }
 
 /**
- * Возвращает отсортированную копию массива (по возрастанию).
+ * Возвращает отсортированную копию массива (по возрастанию согласно компаратору).
  * Исходный массив не изменяется.
  *
+ * @param T тип элементов, поддерживающий сравнение через компаратор
  * @param array исходный массив
+ * @param comparator объект, определяющий порядок сравнения элементов
  * @return новая отсортированная копия массива
  */
-fun sortArrayAscending(array: IntArray): IntArray {
-
-    // copyOf() создаёт копию, apply { sort() } сортирует её на месте и возвращает
-    return array.copyOf().apply { sort() }
+fun <T> sortArrayAscending(array: Array<T>, comparator: Comparator<T>): Array<T> {
+    return array.copyOf().apply { sortWith(comparator) }
 }
 
 /**
- * Сортирует массив по возрастанию на месте.
+ * Сортирует массив по возрастанию на месте согласно компаратору.
  *
+ * ## Сложность:
+ * - Время: **O(n^2)** — реализован алгоритм пузырьковой сортировки (для учебных целей)
+ * - Память: **O(1)** — сортировка на месте без выделения дополнительной памяти
+ *
+ * @param T тип элементов, поддерживающий сравнение через компаратор
  * @param array массив для сортировки
+ * @param comparator объект, определяющий порядок сравнения элементов
  * @return тот же массив, отсортированный по возрастанию
  */
-fun sortArrayInPlace(array: IntArray): IntArray {
+fun <T> sortArrayInPlace(array: Array<T>, comparator: Comparator<T>): Array<T> {
     val n = array.size
-
-    // Внешний цикл — количество проходов
     for (i in 0 until n - 1) {
-
-        // Внутренний цикл — сравнение соседних элементов
         for (j in 0 until n - 1 - i) {
-
-            // Если текущий элемент больше следующего — меняем их местами
-            if (array[j] > array[j + 1]) {
-
-                // Обмен значений
+            if (comparator.compare(array[j], array[j + 1]) > 0) {
                 val temp = array[j]
                 array[j] = array[j + 1]
                 array[j + 1] = temp
@@ -210,108 +167,150 @@ fun sortArrayInPlace(array: IntArray): IntArray {
 }
 
 /**
- * Проверяет, отсортирован ли массив по возрастанию (монотонно).
+ * Проверяет, отсортирован ли массив по возрастанию согласно компаратору.
  *
+ * ## Сложность:
+ * - Время: **O(n)** — в худшем случае проверяются все соседние пары
+ * - Память: **O(1)** — константная дополнительная память
+ *
+ * @param T тип элементов, поддерживающий сравнение через компаратор
  * @param array массив для проверки
+ * @param comparator объект, определяющий порядок сравнения элементов
  * @return true если массив отсортирован по неубыванию
  */
-fun isArraySortedAscending(array: IntArray): Boolean {
-
-    // Проверяем каждый элемент со следующим
-    // Если хотя бы один элемент больше следующего — массив не отсортирован
+fun <T> isArraySortedAscending(array: Array<T>, comparator: Comparator<T>): Boolean {
     for (i in 0 until array.lastIndex) {
-        if (array[i] > array[i + 1]) return false
+        if (comparator.compare(array[i], array[i + 1]) > 0) return false
     }
     return true
 }
 
 /**
- * Линейный поиск элемента в массиве.
- * Последовательно проверяет каждый элемент до нахождения совпадения. Сложность O(n).
+ * Линейный поиск элемента в массиве с использованием компаратора.
+ * Последовательно проверяет каждый элемент до нахождения совпадения.
+ *
+ * ## Сложность:
+ * - Время:
+ *   - Лучший случай: **O(1)** — искомый элемент на первой позиции
+ *   - Средний случай: **O(n)** — элемент находится примерно в середине
+ *   - Худший случай: **O(n)** — элемент в конце массива или отсутствует
+ * - Память: **O(1)** — используется константное количество дополнительной памяти
  *
  * Использовать, когда: массив не отсортирован, очень маленький (< 20 элементов) или поиск однократный.
- * Не использовать, когда: массив большой и отсортирован (лучше [binarySearch] или [interpolationSearch]).
+ * Не использовать, когда: массив большой и отсортирован (лучше [binarySearch]).
  *
+ * @param T тип элементов, поддерживающий сравнение через компаратор
  * @param array массив для поиска (может быть неотсортированным)
  * @param target искомое значение
+ * @param comparator объект, определяющий порядок сравнения элементов
  * @return индекс элемента или -1 если не найден
  */
-fun findLineElement(array: IntArray, target: Int ): Int{
+fun <T> findLineElement(array: Array<T>, target: T, comparator: Comparator<T>): Long {
+    for (i in array.indices) {
 
-    for (i in array.indices){
+        if (comparator.compare(array[i], target) == 0) {
 
-        if (target == array[i]) {
-
-            println("Цель ($target) найдена, индекс числа в массие: $i")
-
-            return i
+            return i.toLong()
         }
     }
-
-    println("Данного числа ($target) в массиве нет")
     return -1
 }
 
 /**
- * Бинарный поиск элемента в отсортированном массиве.
- * На каждом шаге отбрасывает половину диапазона, обеспечивая сложность O(log n).
+ * Бинарный поиск элемента в отсортированном массиве с использованием компаратора.
+ * На каждом шаге отбрасывает половину диапазона, обеспечивая логарифмическую сложность.
  *
- * Использовать, когда: массив отсортирован, распределение данных неизвестно или неравномерное.
- * Не использовать, когда: массив не отсортирован (лучше [findLineElement]) или данные равномерно распределены (лучше [interpolationSearch]).
+ * ## Сложность:
+ * - Время:
+ *   - Лучший случай: **O(1)** — искомый элемент сразу в середине
+ *   - Средний случай: **O(log n)**
+ *   - Худший случай: **O(log n)** — требуется максимальное число делений пополам
+ * - Память: **O(1)** — итеративная реализация без рекурсии
  *
- * @param array отсортированный по возрастанию массив
+ * Использовать, когда: массив отсортирован согласно компаратору, распределение данных неизвестно.
+ * Не использовать, когда: массив не отсортирован или данные равномерно распределены (лучше [interpolationSearch] для чисел).
+ *
+ * @param T тип элементов, поддерживающий сравнение через компаратор
+ * @param array отсортированный по возрастанию (согласно [comparator]) массив
  * @param target искомое значение
+ * @param comparator объект, определяющий порядок сравнения элементов
  * @return индекс элемента или -1 если не найден
  */
-fun binarySearch(array: IntArray, target: Int): Int {
-
+fun <T> binarySearch(
+    array: Array<T>,
+    target: T,
+    comparator: Comparator<T>
+): Long {
     var left = 0
     var right = array.size - 1
 
     while (left <= right) {
-
-        // Вычисляем середину
         val mid = left + (right - left) / 2
+        val cmp = comparator.compare(array[mid], target)
 
         when {
-            array[mid] == target -> return mid
-            array[mid] < target -> left = mid + 1   // Ищем справа
-            else -> right = mid - 1                 // Ищем слева
+            cmp == 0 -> return mid.toLong()
+            cmp < 0 -> left = mid + 1
+            else -> right = mid - 1
         }
     }
     return -1
 }
 
 /**
- * Интерполяционный поиск элемента в отсортированном массиве.
- * Работает эффективно только при равномерном распределении данных.
+ * Интерполяционный поиск элемента в отсортированном массиве (обобщённая версия).
+ * Оценивает позицию искомого элемента на основе его числового значения относительно границ диапазона.
  *
+ * ## Сложность:
+ * - Время:
+ *   - Лучший случай: **O(1)** — угадали позицию с первой попытки
+ *   - Средний случай: **O(log log n)** — *только при равномерном распределении данных*
+ *   - Худший случай: **O(n)** — при неравномерном распределении
+ * - Память: **O(1)** — константная дополнительная память
+ *
+ * ## Важные условия:
+ * - Массив **должен быть отсортирован** согласно [comparator]
+ * - Функция [toDouble] должна возвращать значения, сохраняющие порядок элементов
+ * - Данные должны быть **равномерно распределёнными** для эффективности
+ *
+ * @param T тип элементов массива
  * @param array отсортированный массив
  * @param target искомое значение
+ * @param comparator компаратор для сравнения элементов
+ * @param toLong функция преобразования элемента в Long для расчёта интерполяции
  * @return индекс элемента или -1 если не найден
  */
-fun interpolationSearch(array: IntArray, target: Int): Int {
+fun <T> interpolationSearch(
+    array: Array<T>,
+    target: T,
+    comparator: Comparator<T>,
+    toLong: (T) -> Long
+): Long {
     var left = 0
     var right = array.size - 1
 
-    while (left <= right && target >= array[left] && target <= array[right]) {
+    while (left <= right) {
+        val targetVal = toLong(target)
 
-        // Защита от деления на ноль
-        if (array[right] == array[left]) {
-            if (array[left] == target) return left
+        // значения
+        val leftVal = toLong(array[left])
+        val rightVal = toLong(array[right])
+
+        // Защита от деления на ноль (все элементы в диапазоне одинаковы)
+        if (rightVal == leftVal) {
+            if (comparator.compare(array[left], target) == 0) return left.toLong()
             break
         }
 
         // Формула интерполяции
-        val pos = left + ((target - array[left]) * (right - left)) /
-                (array[right] - array[left])
+        val pos = left + ((targetVal - leftVal) * (right - left) / (rightVal - leftVal)).toInt()
 
-        // Проверка границ (на случай выхода за пределы)
+        // Проверка границ (на случай выхода зца пределы из-за округления)
         if (pos < left || pos > right) break
 
         when {
-            array[pos] == target -> return pos
-            array[pos] < target -> left = pos + 1
+            comparator.compare(array[pos], target) == 0 -> return pos.toLong()
+            comparator.compare(array[pos], target) < 0 -> left = pos + 1
             else -> right = pos - 1
         }
     }
@@ -323,27 +322,29 @@ fun interpolationSearch(array: IntArray, target: Int): Int {
  * Линейный поиск первого элемента, удовлетворяющего условию (предикату).
  *
  * Последовательно проверяет каждый элемент массива, передавая его в функцию [predicate].
- * Возвращает первый элемент, для которого предикат вернул true.
+ * Возвращает первый элемент, для которого предикат вернул `true`.
  *
  * ## Сложность:
- * - Время: **O(n)** — в худшем случае проверяются все элементы
- * - Память: **O(1)** — не требует дополнительной памяти
+ * - Время:
+ *   - Лучший случай: **O(1)** — первый элемент удовлетворяет условию
+ *   - Средний случай: **O(n)** — в зависимости от распределения подходящих элементов
+ *   - Худший случай: **O(n)** — ни один элемент не подходит или подходящий последний
+ * - Память: **O(1)** — не использует дополнительную память, кроме хранения замыкания
  *
  * ## Когда использовать:
- * - стоит, коглда нужен поиск по **сложному условию** (не просто сравнение с значением)
- * - когда Массив **не отсортирован**
- * - стоит, когда нужно найти **первый подходящий** элемент
+ * - когда нужен поиск по **сложному условию** (не просто сравнение с значением)
+ * - когда массив **не отсортирован**
+ * - когда нужно найти **первый подходящий** элемент
  * - Не стоит для простого поиска по значению — используйте [binarySearch] или [findLineElement]
  *
  * @param T тип элементов массива
  * @param array массив для поиска
- * @param predicate функция-условие, принимающая элемент и возвращающая true/false
- * @return первый элемент, удовлетворяющий условию, или null если ничего не найдено
+ * @param predicate функция-условие, принимающая элемент и возвращающая Boolean
+ * @return первый элемент, удовлетворяющий условию, или `null` если ничего не найдено
  *
  * @sample
- * val numbers = intArrayOf(1, 5, 12, 8, 20)
- * val firstEven = findByPredicate(numbers) { it % 2 == 0 }  // 12
- * val firstLarge = findByPredicate(numbers) { it > 15 }     // 20
+ * val numbers = arrayOf("1", "5", "12", "8", "20")
+ * val firstEven = findByPredicate(numbers) { it.toInt() % 2 == 0 }  // "12"
  */
 fun <T> findByPredicate(array: Array<T>, predicate: (T) -> Boolean): T? {
     for (element in array) {

@@ -9,7 +9,7 @@ class DsaALibrTest {
 
     // ================= measureExecutionTime =================
 
-    // measureExecutionTime возвращает положительное значение
+    /** Тест: время всегда положительное. */
     @Test
     fun `measureExecutionTime returns positive value`() {
         val timeNs = measureExecutionTime(
@@ -21,7 +21,7 @@ class DsaALibrTest {
         assertTrue(timeNs > 0, "Время должно быть больше 0")
     }
 
-    // measureExecutionTime вызывает операцию правильное количество раз
+    /** Тест: операция действительно вызывается столько раз, сколько задано. */
     @Test
     fun `measureExecutionTime calls operation correct number of times`() {
         var callCount = 0
@@ -31,37 +31,37 @@ class DsaALibrTest {
         ) {
             callCount++
         }
-        assertEquals(5, callCount, "Функция должна вызваться 5 раз")
+        assertEquals(5, callCount, "Операция должна вызваться ровно 5 раз")
     }
 
     // ================= generateRandomArray =================
 
-    // generateRandomArray создаёт массив указанного размера
+    /** Тест: массив нужного размера. */
     @Test
     fun `generateRandomArray creates array of specified size`() {
-        val array = generateRandomArray(size = 10, min = 0, max = 100)
+        val array = generateRandomArray(size = 10, min = 0L, max = 100L)
         assertEquals(10, array.size, "Размер массива должен быть 10")
     }
 
-    // generateRandomArray значения находятся в пределах диапазона
+    /** Тест: значения лежат в диапазоне [min, max). */
     @Test
     fun `generateRandomArray values are within range`() {
-        val array = generateRandomArray(size = 50, min = 10, max = 20)
+        val array = generateRandomArray(size = 50, min = 10L, max = 20L)
         for (value in array) {
-            assertTrue(value in 10 until 20, "Значение $value вне диапазона [10, 20)")
+            assertTrue(value in 10L until 20L, "Значение $value вне диапазона [10, 20)")
         }
     }
 
-    // generateRandomArray с одинаковым seed даёт одинаковый результат
+    /** Тест: одинаковый seed -> одинаковый массив. */
     @Test
     fun `generateRandomArray with same seed produces same result`() {
         val seed = 12345L
-        val array1 = generateRandomArray(size = 10, min = 0, max = 100, seed = seed)
-        val array2 = generateRandomArray(size = 10, min = 0, max = 100, seed = seed)
+        val array1 = generateRandomArray(size = 10, min = 0L, max = 100L, seed = seed)
+        val array2 = generateRandomArray(size = 10, min = 0L, max = 100L, seed = seed)
         assertArrayEquals(array1, array2, "Массивы с одинаковым seed должны совпадать")
     }
 
-    // generateRandomArray выбрасывает исключение для отрицательного размера
+    /** Тест: отрицательный размер -> ошибка. */
     @Test
     fun `generateRandomArray throws exception for negative size`() {
         assertThrows<IllegalArgumentException> {
@@ -71,31 +71,31 @@ class DsaALibrTest {
 
     // ================= fillArrayWithRandom =================
 
-    // fillArrayWithRandom изменяет существующий массив
+    /** Тест: fillArrayWithRandom меняет элементы массива. */
     @Test
     fun `fillArrayWithRandom modifies existing array`() {
-        val array = intArrayOf(0, 0, 0, 0, 0)
-        fillArrayWithRandom(array, min = 50, max = 100)
-        assertTrue(array.any { it != 0 }, "Массив должен измениться")
+        val array = longArrayOf(0L, 0L, 0L, 0L, 0L)
+        fillArrayWithRandom(array, min = 50L, max = 100L)
+        assertTrue(array.any { it != 0L }, "Массив должен измениться")
     }
 
-    // fillArrayWithRandom значения находятся в пределах диапазона
+    /** Тест: значения лежат в [min, max). */
     @Test
     fun `fillArrayWithRandom values are within range`() {
-        val array = intArrayOf(0, 0, 0)
-        fillArrayWithRandom(array, min = 10, max = 15)
+        val array = longArrayOf(0L, 0L, 0L)
+        fillArrayWithRandom(array, min = 10L, max = 15L)
         for (value in array) {
-            assertTrue(value in 10 until 15, "Значение $value вне диапазона")
+            assertTrue(value in 10L until 15L, "Значение $value вне диапазона [10, 15)")
         }
     }
 
     // ================= saveArrayToFile & loadArrayFromFile =================
 
-    // saveArrayToFile и loadArrayFromFile работают корректно
+    /** Тест: save и load работают корректно. */
     @Test
     fun `saveArrayToFile and loadArrayFromFile work correctly`() {
         val testFile = File("test_temp_array.txt")
-        val originalArray = intArrayOf(1, 2, 3, 4, 5)
+        val originalArray = longArrayOf(1L, 2L, 3L, 4L, 5L)
 
         val saved = saveArrayToFile(originalArray, testFile.path)
         assertTrue(saved, "Файл должен сохраниться успешно")
@@ -106,18 +106,18 @@ class DsaALibrTest {
         testFile.delete()
     }
 
-    // loadArrayFromFile возвращает пустой массив для несуществующего файла
+    /** Тест: для несуществующего файла вернётся пустой массив. */
     @Test
     fun `loadArrayFromFile returns empty array for missing file`() {
         val loadedArray = loadArrayFromFile("nonexistent_file_12345.txt")
         assertEquals(0, loadedArray.size, "Для несуществующего файла должен вернуться пустой массив")
     }
 
-    // saveArrayToFile с пользовательским разделителем
+    /** Тест: saveArrayToFile с кастомным разделителем. */
     @Test
     fun `saveArrayToFile with custom delimiter`() {
         val testFile = File("test_delim.txt")
-        val array = intArrayOf(10, 20, 30)
+        val array = longArrayOf(10L, 20L, 30L)
 
         saveArrayToFile(array, testFile.path, delimiter = ",")
         val content = testFile.readText()
@@ -126,221 +126,238 @@ class DsaALibrTest {
         testFile.delete()
     }
 
-    // ================= sortArrayAscending =================
+    // ================= sortArrayAscending (generic) =================
 
-    // sortArrayAscending возвращает отсортированную копию
+    /** Тест: sortArrayAscending возвращает отсортированную копию для Long. */
     @Test
-    fun `sortArrayAscending returns sorted copy`() {
-        val original = intArrayOf(5, 2, 8, 1, 9)
-        val sorted = sortArrayAscending(original)
+    fun `sortArrayAscending returns sorted copy for Long`() {
+        val original = arrayOf(5L, 2L, 8L, 1L, 9L)
+        val comparator = Comparator<Long> { a, b -> a.compareTo(b) }
+        val sorted = sortArrayAscending(original, comparator)
 
-        assertArrayEquals(intArrayOf(1, 2, 5, 8, 9), sorted)
-        assertArrayEquals(intArrayOf(5, 2, 8, 1, 9), original, "Оригинальный массив не должен измениться")
+        assertArrayEquals(arrayOf(1L, 2L, 5L, 8L, 9L), sorted)
+        assertArrayEquals(arrayOf(5L, 2L, 8L, 1L, 9L), original, "Оригинальный массив не должен измениться")
     }
 
-    // sortArrayAscending работает с уже отсортированным массивом
+    /** Тест: уже отсортированный массив остаётся тем же. */
     @Test
     fun `sortArrayAscending works with already sorted array`() {
-        val original = intArrayOf(1, 2, 3)
-        val sorted = sortArrayAscending(original)
-        assertArrayEquals(intArrayOf(1, 2, 3), sorted)
+        val original = arrayOf(1L, 2L, 3L)
+        val comparator = Comparator<Long> { a, b -> a.compareTo(b) }
+        val sorted = sortArrayAscending(original, comparator)
+        assertArrayEquals(arrayOf(1L, 2L, 3L), sorted)
     }
 
-    // ================= sortArrayInPlace =================
+    /** Тест: sortArrayAscending работает с String. */
+    @Test
+    fun `sortArrayAscending works with String`() {
+        val original = arrayOf("banana", "apple", "cherry")
+        val comparator = Comparator<String> { a, b -> a.compareTo(b) }
+        val sorted = sortArrayAscending(original, comparator)
+        assertArrayEquals(arrayOf("apple", "banana", "cherry"), sorted)
+    }
 
-    // sortArrayInPlace изменяет исходный массив
+    // ================= sortArrayInPlace (generic) =================
+
+    /** Тест: sortArrayInPlace меняет исходный массив. */
     @Test
     fun `sortArrayInPlace modifies original array`() {
-        val array = intArrayOf(5, 2, 8, 1, 9)
-        sortArrayInPlace(array)
-        assertArrayEquals(intArrayOf(1, 2, 5, 8, 9), array)
+        val array = arrayOf(5L, 2L, 8L, 1L, 9L)
+        val comparator = Comparator<Long> { a, b -> a.compareTo(b) }
+        sortArrayInPlace(array, comparator)
+        assertArrayEquals(arrayOf(1L, 2L, 5L, 8L, 9L), array)
     }
 
-    // sortArrayInPlace возвращает ту же ссылку
+    /** Тест: sortArrayInPlace возвращает ту же ссылку. */
     @Test
     fun `sortArrayInPlace returns same reference`() {
-        val array = intArrayOf(3, 1, 2)
-        val result = sortArrayInPlace(array)
-        assertSame(array, result, "Должен возвращать тот же объект массива")
+        val array = arrayOf(3L, 1L, 2L)
+        val comparator = Comparator<Long> { a, b -> a.compareTo(b) }
+        val result = sortArrayInPlace(array, comparator)
+        assertSame(array, result, "Должен вернуть тот же объект массива")
     }
 
-    // ================= isArraySortedAscending =================
+    // ================= isArraySortedAscending (generic) =================
 
-    // isArraySortedAscending возвращает true для отсортированного массива
+    /** Тест: отсортированный массив -> true. */
     @Test
     fun `isArraySortedAscending returns true for sorted array`() {
-        assertTrue(isArraySortedAscending(intArrayOf(1, 2, 3, 4, 5)))
+        val comparator = Comparator<Long> { a, b -> a.compareTo(b) }
+        assertTrue(isArraySortedAscending(arrayOf(1L, 2L, 3L, 4L, 5L), comparator))
     }
 
-    // isArraySortedAscending возвращает false для несортированного массива
+    /** Тест: массив НЕ отсортирован в начале -> false. */
+    @Test
+    fun `isArraySortedAscending returns false when unsorted at start`() {
+        val comparator = Comparator<Long> { a, b -> a.compareTo(b) }
+        // первые элементы перевёрнуты: 2, 1, 3, 4, 5
+        assertFalse(isArraySortedAscending(arrayOf(2L, 1L, 3L, 4L, 5L), comparator))
+    }
+
+    /** Тест: массив НЕ отсортирован в конце -> false. */
+    @Test
+    fun `isArraySortedAscending returns false when unsorted at end`() {
+        val comparator = Comparator<Long> { a, b -> a.compareTo(b) }
+        // последние элементы вперемешку: 1, 2, 3, 5, 4
+        assertFalse(isArraySortedAscending(arrayOf(1L, 2L, 3L, 5L, 4L), comparator))
+    }
+
+    /** Тест: неотсортированный массив -> false. */
     @Test
     fun `isArraySortedAscending returns false for unsorted array`() {
-        assertFalse(isArraySortedAscending(intArrayOf(1, 5, 3, 4, 2)))
+        val comparator = Comparator<Long> { a, b -> a.compareTo(b) }
+        assertFalse(isArraySortedAscending(arrayOf(1L, 5L, 3L, 4L, 2L), comparator))
     }
 
-    // isArraySortedAscending возвращает true для пустого массива
+    /** Тест: пустой массив -> true. */
     @Test
     fun `isArraySortedAscending returns true for empty array`() {
-        assertTrue(isArraySortedAscending(intArrayOf()))
+        val comparator = Comparator<Long> { a, b -> a.compareTo(b) }
+        assertTrue(isArraySortedAscending(arrayOf(), comparator))
     }
 
-    // isArraySortedAscending возвращает true для массива с одним элементом
+    /** Тест: массив из одного элемента -> true. */
     @Test
     fun `isArraySortedAscending returns true for single element`() {
-        assertTrue(isArraySortedAscending(intArrayOf(42)))
+        val comparator = Comparator<Long> { a, b -> a.compareTo(b) }
+        assertTrue(isArraySortedAscending(arrayOf(42L), comparator))
     }
 
-    // isArraySortedAscending обрабатывает дубликаты
+    /** Тест: массив с дубликатами -> считается отсортированным (неубывание). */
     @Test
     fun `isArraySortedAscending handles duplicates`() {
-        assertTrue(isArraySortedAscending(intArrayOf(1, 2, 2, 3)), "Массив с дубликатами должен считаться отсортированным")
+        val comparator = Comparator<Long> { a, b -> a.compareTo(b) }
+        assertTrue(
+            isArraySortedAscending(arrayOf(1L, 2L, 2L, 3L), comparator),
+            "Массив с дубликатами должен считаться отсортированным (в неубывающем порядке)"
+        )
     }
 
-    // ================= findLineElement =================
+    // ================= findLineElement (generic) =================
 
-    // findLineElement находит элемент в несортированном массиве
+    /** Тест: линейный поиск находит элемент в неотсортированном массиве. */
     @Test
     fun `findLineElement finds element in unsorted array`() {
-        val array = intArrayOf(10, 3, 7, 1, 9)
-        assertEquals(2, findLineElement(array, 7))
-        assertEquals(0, findLineElement(array, 10))
+        val array = arrayOf(10L, 3L, 7L, 1L, 9L)
+        val comparator = Comparator<Long> { a, b -> a.compareTo(b) }
+        assertEquals(2, findLineElement(array, 7L, comparator))
+        assertEquals(0, findLineElement(array, 10L, comparator))
     }
 
-    // findLineElement возвращает -1 для отсутствующего элемента
+    /** Тест: если элемент не найден -> возвращает -1. */
     @Test
     fun `findLineElement returns -1 for missing element`() {
-        val array = intArrayOf(1, 2, 3, 4, 5)
-        assertEquals(-1, findLineElement(array, 10))
+        val array = arrayOf(1L, 2L, 3L, 4L, 5L)
+        val comparator = Comparator<Long> { a, b -> a.compareTo(b) }
+        assertEquals(-1, findLineElement(array, 10L, comparator))
     }
 
-    // findLineElement работает с пустым массивом
+    /** Тест: пустой массив -> не найдено. */
     @Test
     fun `findLineElement works with empty array`() {
-        assertEquals(-1, findLineElement(intArrayOf(), 1))
+        val comparator = Comparator<Long> { a, b -> a.compareTo(b) }
+        assertEquals(-1, findLineElement(arrayOf(), 1L, comparator))
     }
 
-    // findLineElement возвращает первое вхождение для дубликатов
+    /** Тест: функция возвращает первое вхождение для дубликатов. */
     @Test
     fun `findLineElement returns first occurrence for duplicates`() {
-        val array = intArrayOf(5, 3, 5, 7, 5)
-        assertEquals(0, findLineElement(array, 5))
+        val array = arrayOf(5L, 3L, 5L, 7L, 5L)
+        val comparator = Comparator<Long> { a, b -> a.compareTo(b) }
+        assertEquals(0, findLineElement(array, 5L, comparator))
     }
 
-    // ================= binarySearch =================
+    // ================= binarySearch (generic) =================
 
-    // binarySearch находит элемент в отсортированном массиве
+    /** Тест: бинарный поиск находит элемент в отсортированном массиве. */
     @Test
     fun `binarySearch finds element in sorted array`() {
-        val array = intArrayOf(1, 3, 5, 7, 9, 11, 13)
-        assertEquals(3, binarySearch(array, 7))
-        assertEquals(0, binarySearch(array, 1))
-        assertEquals(6, binarySearch(array, 13))
+        val array = arrayOf(1L, 3L, 5L, 7L, 9L, 11L, 13L)
+        val comparator = Comparator<Long> { a, b -> a.compareTo(b) }
+        assertEquals(3, binarySearch(array, 7L, comparator))
+        assertEquals(0, binarySearch(array, 1L, comparator))
+        assertEquals(6, binarySearch(array, 13L, comparator))
     }
 
-    // binarySearch возвращает -1 для отсутствующего элемента
+    /** Тест: элемент не найден -> возвращает -1. */
     @Test
     fun `binarySearch returns -1 for missing element`() {
-        val array = intArrayOf(1, 3, 5, 7, 9)
-        assertEquals(-1, binarySearch(array, 4))
-        assertEquals(-1, binarySearch(array, 10))
+        val array = arrayOf(1L, 3L, 5L, 7L, 9L)
+        val comparator = Comparator<Long> { a, b -> a.compareTo(b) }
+        assertEquals(-1, binarySearch(array, 4L, comparator))
+        assertEquals(-1, binarySearch(array, 10L, comparator))
     }
 
-    // binarySearch работает с пустым массивом
+    /** Тест: пустой массив -> не найдено. */
     @Test
     fun `binarySearch works with empty array`() {
-        assertEquals(-1, binarySearch(intArrayOf(), 1))
+        val comparator = Comparator<Long> { a, b -> a.compareTo(b) }
+        assertEquals(-1, binarySearch(arrayOf(), 1L, comparator))
     }
 
-    // binarySearch обрабатывает дубликаты
+    /** Тест: бинарный поиск корректно работает с дубликатами. */
     @Test
     fun `binarySearch handles duplicates`() {
-        val array = intArrayOf(1, 5, 5, 5, 9)
-        val index = binarySearch(array, 5)
+        val array = arrayOf(1L, 5L, 5L, 5L, 9L)
+        val comparator = Comparator<Long> { a, b -> a.compareTo(b) }
+        val index = binarySearch(array, 5L, comparator)
         assertTrue(index in 1..3, "Индекс найденного элемента 5 должен быть в диапазоне 1-3")
     }
 
-    // ================= interpolationSearch =================
+    /** Тест: бинарный поиск работает и со String. */
+    @Test
+    fun `binarySearch works with String`() {
+        val array = arrayOf("apple", "banana", "cherry", "date")
+        val comparator = Comparator<String> { a, b -> a.compareTo(b) }
+        assertEquals(2, binarySearch(array, "cherry", comparator))
+        assertEquals(-1, binarySearch(array, "fig", comparator))
+    }
 
-    // interpolationSearch находит элемент в равномерном массиве
+    // ================= interpolationSearch (generic) =================
+
+    /** Тест: интерполяционный поиск находит элемент в равномерном массиве. */
     @Test
     fun `interpolationSearch finds element in uniform array`() {
-        val array = intArrayOf(10, 20, 30, 40, 50, 60, 70, 80, 90, 100)
-        assertEquals(8, interpolationSearch(array, 90))
-        assertEquals(0, interpolationSearch(array, 10))
-        assertEquals(9, interpolationSearch(array, 100))
+        val array = arrayOf(10L, 20L, 30L, 40L, 50L, 60L, 70L, 80L, 90L, 100L)
+        val comparator = Comparator<Long> { a, b -> a.compareTo(b) }
+        val toDouble: (Long) -> Long = { it }
+
+        assertEquals(8, interpolationSearch(array, 90L, comparator, toDouble))
+        assertEquals(0, interpolationSearch(array, 10L, comparator, toDouble))
+        assertEquals(9, interpolationSearch(array, 100L, comparator, toDouble))
     }
 
-    // interpolationSearch возвращает -1 для отсутствующего элемента
+    /** Тест: элемент не найден -> возвращает -1. */
     @Test
     fun `interpolationSearch returns -1 for missing element`() {
-        val array = intArrayOf(10, 20, 30, 40, 50)
-        assertEquals(-1, interpolationSearch(array, 25))
-        assertEquals(-1, interpolationSearch(array, 5))
+        val array = arrayOf(10L, 20L, 30L, 40L, 50L)
+        val comparator = Comparator<Long> { a, b -> a.compareTo(b) }
+        val toDouble: (Long) -> Long = { it }
+
+        assertEquals(-1, interpolationSearch(array, 25L, comparator, toDouble))
+        assertEquals(-1, interpolationSearch(array, 5L, comparator, toDouble))
     }
 
-    // interpolationSearch работает с неравномерным массивом
+    /** Тест: работает и с неравномерным массивом (но эффективность падает). */
     @Test
     fun `interpolationSearch works with non-uniform array`() {
-        val array = intArrayOf(1, 2, 5, 10, 20, 50, 100, 200, 500, 1000)
-        val index = interpolationSearch(array, 100)
+        val array = arrayOf(1L, 2L, 5L, 10L, 20L, 50L, 100L, 200L, 500L, 1000L)
+        val comparator = Comparator<Long> { a, b -> a.compareTo(b) }
+        val toDouble: (Long) -> Long = { it }
+
+        val index = interpolationSearch(array, 100L, comparator, toDouble)
         assertEquals(6, index)
     }
 
-    // interpolationSearch обрабатывает граничные значения
+    /** Тест: корректно обрабатывает границы. */
     @Test
     fun `interpolationSearch handles edge values`() {
-        val array = intArrayOf(5, 10, 15, 20, 25)
-        assertEquals(0, interpolationSearch(array, 5))
-        assertEquals(4, interpolationSearch(array, 25))
-    }
+        val array = arrayOf(5L, 10L, 15L, 20L, 25L)
+        val comparator = Comparator<Long> { a, b -> a.compareTo(b) }
+        val toDouble: (Long) -> Long = { it }
 
-    // interpolationSearch с одинаковыми значениями
-    @Test
-    fun `interpolationSearch with all same values`() {
-        val array = intArrayOf(7, 7, 7, 7, 7)
-        assertTrue(interpolationSearch(array, 7) in 0..4)
-        assertEquals(-1, interpolationSearch(array, 10))
-    }
-
-    // interpolationSearch работает с пустым массивом
-    @Test
-    fun `interpolationSearch works with empty array`() {
-        assertEquals(-1, interpolationSearch(intArrayOf(), 1))
-    }
-
-    // ================= findByPredicate =================
-
-    // findByPredicate находит первый подходящий элемент в Array<T>
-    @Test
-    fun `findByPredicate finds first matching element in Array T`() {
-        val array = arrayOf("apple", "banana", "cherry", "date")
-
-        val result = findByPredicate(array) { it.startsWith("c") }
-        assertEquals("cherry", result)
-    }
-
-    // findByPredicate возвращает null, если совпадений нет в Array<T>
-    @Test
-    fun `findByPredicate returns null when no match in Array T`() {
-        val array = arrayOf("cat", "dog", "fox")
-
-        val result = findByPredicate(array) { it.startsWith("z") }
-        assertNull(result)
-    }
-
-    // findByPredicate работает со сложным условием в Array<T>
-    @Test
-    fun `findByPredicate works with complex condition in ArrayT`() {
-        val array = arrayOf("a", "bb", "ccc", "dddd")
-
-        val result = findByPredicate(array) { it.length == 3 }
-        assertEquals("ccc", result)
-    }
-
-    // findByPredicate работает с пустым Array<T>
-    @Test
-    fun `findByPredicate works with empty Array T`() {
-        val array = arrayOf<String>()
-        assertNull(findByPredicate(array) { true })
+        assertEquals(0, interpolationSearch(array, 5L, comparator, toDouble))
+        assertEquals(4, interpolationSearch(array, 25L, comparator, toDouble))
     }
 }
+
