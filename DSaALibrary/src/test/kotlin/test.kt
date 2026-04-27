@@ -157,24 +157,153 @@ class DsaALibrTest {
         assertArrayEquals(arrayOf("apple", "banana", "cherry"), sorted)
     }
 
-    // ================= sortArrayInPlace (generic) =================
+    // ================= BubleSortArrayInPlace (generic) =================
 
-    /** Тест: sortArrayInPlace меняет исходный массив. */
+    /** Тест: BubleSortArrayInPlace меняет исходный массив. */
     @Test
-    fun `sortArrayInPlace modifies original array`() {
+    fun `BubleSortArrayInPlace modifies original array`() {
         val array = arrayOf(5L, 2L, 8L, 1L, 9L)
         val comparator = Comparator<Long> { a, b -> a.compareTo(b) }
-        sortArrayInPlace(array, comparator)
+        BubleSortArrayInPlace(array, comparator)
         assertArrayEquals(arrayOf(1L, 2L, 5L, 8L, 9L), array)
     }
 
-    /** Тест: sortArrayInPlace возвращает ту же ссылку. */
+    /** Тест: BubleSortArrayInPlace сортирует массив, в котором первый элемент - самый большой  */
     @Test
-    fun `sortArrayInPlace returns same reference`() {
-        val array = arrayOf(3L, 1L, 2L)
-        val comparator = Comparator<Long> { a, b -> a.compareTo(b) }
-        val result = sortArrayInPlace(array, comparator)
-        assertSame(array, result, "Должен вернуть тот же объект массива")
+    fun `BubleSortArrayInPlace work with another array`() {
+        val array = arrayOf(10L, 9L, 8L, 7L, 6L, 5L, 3L, 1L)
+        val comparator = Comparator<Long> {a, b -> a.compareTo(b) }
+        val result = arrayOf(1L, 3L, 5L, 6L, 7L, 8L, 9L, 10L)
+        BubleSortArrayInPlace(array, comparator)
+        assertArrayEquals(result, array)
+
+    }
+
+    @Test
+    fun `BubleSortArrayInPlace c массивом по возрастанию`(){
+        val array = arrayOf(1L, 2L, 3L, 4L, 5L, 6L)
+        val comparator = Comparator<Long> {a, b -> a.compareTo(b)}
+        BubleSortArrayInPlace(array, comparator)
+        assertArrayEquals(array, array)
+
+    }
+
+    @Test
+    fun `BubleSortArrayInPlace с повоторами`(){
+        val array = arrayOf(1L, 2L, 2L, 3L, 4L, 5L, 6L, 3L)
+        val comparator = Comparator<Long> {a, b -> a.compareTo(b)}
+        val result = arrayOf(1L, 2L, 2L, 3L, 3L, 4L, 5L, 6L)
+        BubleSortArrayInPlace(array, comparator)
+        assertArrayEquals(array, result)
+    }
+
+    @Test
+    fun `BubleSortArrayInPlace с отрицательными числами`(){
+        val array = arrayOf(1L, 2L, -2L, -3L, 4L, 5L, 6L, 3L)
+        val comparator = Comparator<Long> {a, b -> a.compareTo(b)}
+        val result = arrayOf(-3L, -2L, 1L, 2L, 3L, 4L, 5L, 6L)
+        BubleSortArrayInPlace(array, comparator)
+        assertArrayEquals(array, result)
+    }
+
+    // ================= quickSort (generic) =================
+    @Test
+    fun `quickSort работает`(){
+        val array = arrayOf(1, 2, 7, 4, 1341)
+        val res = arrayOf(1, 2, 4, 7, 1341)
+
+        quickSort(array, 0, array.lastIndex)
+        assertArrayEquals(array, res)
+    }
+
+    @Test
+    fun `quickSort работает с повторениями`(){
+        val array = arrayOf(1, 2, 7, 4, 1341, 1, 2)
+        val res = arrayOf(1, 1, 2, 2, 4, 7, 1341)
+
+        quickSort(array, 0, array.lastIndex)
+        assertArrayEquals(array, res)
+    }
+
+    @Test
+    fun `quickSort работает c отрицательными числами`(){
+        val array = arrayOf(1, 2, 7, 4, 1341, -1, -2)
+        val res = arrayOf(-2, -1, 1, 2, 4, 7, 1341)
+
+        quickSort(array, 0, array.lastIndex)
+        assertArrayEquals(array, res)
+    }
+
+    @Test
+    fun `quickSort работает c отсортированным массивом`(){
+        val array = arrayOf(1, 2, 4, 7, 1341)
+        val res = arrayOf(1, 2, 4, 7, 1341)
+
+        quickSort(array, 0, array.lastIndex)
+        assertArrayEquals(array, res)
+    }
+
+    // ================= mergeSort (generic) =================
+    @Test
+    fun `mergeSort работает` (){
+        val array = arrayOf(1, 2, 7, 4, 1341)
+        val res = arrayOf(1, 2, 4, 7, 1341)
+        val sorted = mergeSort(array)
+        assertArrayEquals(res, sorted)
+    }
+
+    @Test
+    fun `mergeSort работает с повторениями`(){
+        val array = arrayOf(1, 2, 7, 4, 1341, 1, 2)
+        val res = arrayOf(1, 1, 2, 2, 4, 7, 1341)
+
+        val sorted = mergeSort(array)
+        assertArrayEquals(res, sorted)
+    }
+
+    @Test
+    fun `mergeSort работает c отрицательными числами`(){
+        val array = arrayOf(1, 2, 7, 4, 1341, -1, -2)
+        val res = arrayOf(-2, -1, 1, 2, 4, 7, 1341)
+
+        val sorted = mergeSort(array)
+        assertArrayEquals(res, sorted)
+    }
+
+    @Test
+    fun `mergeSort работает c отсортированным массивом`(){
+        val array = arrayOf(1, 2, 4, 7, 1341)
+        val res = arrayOf(1, 2, 4, 7, 1341)
+
+        val sorted = mergeSort(array)
+        assertArrayEquals(res, sorted)
+    }
+
+    @Test
+    fun `mergeSort работает c массивом в обратном порядке`(){
+        val array = arrayOf(1341, 7, 4, 2, 1)
+        val res = arrayOf(1, 2, 4, 7, 1341)
+
+        val sorted = mergeSort(array)
+        assertArrayEquals(res, sorted)
+    }
+
+    @Test
+    fun `mergeSort работает с пустым массивом`(){
+        val array = arrayOf<Int>()
+        val res = arrayOf<Int>()
+
+        val sorted = mergeSort(array)
+        assertArrayEquals(res, sorted)
+    }
+
+    @Test
+    fun `mergeSort работает с одним элементом`(){
+        val array = arrayOf(42)
+        val res = arrayOf(42)
+
+        val sorted = mergeSort(array)
+        assertArrayEquals(res, sorted)
     }
 
     // ================= isArraySortedAscending (generic) =================
@@ -273,34 +402,34 @@ class DsaALibrTest {
     @Test
     fun `binarySearch finds element in sorted array`() {
         val array = arrayOf(1L, 3L, 5L, 7L, 9L, 11L, 13L)
-        val comparator = Comparator<Long> { a, b -> a.compareTo(b) }
-        assertEquals(3, binarySearch(array, 7L, comparator))
-        assertEquals(0, binarySearch(array, 1L, comparator))
-        assertEquals(6, binarySearch(array, 13L, comparator))
+
+        assertEquals(3, binarySearch(array, 7L))
+        assertEquals(0, binarySearch(array, 1L))
+        assertEquals(6, binarySearch(array, 13L))
     }
 
     /** Тест: элемент не найден -> возвращает -1. */
     @Test
     fun `binarySearch returns -1 for missing element`() {
         val array = arrayOf(1L, 3L, 5L, 7L, 9L)
-        val comparator = Comparator<Long> { a, b -> a.compareTo(b) }
-        assertEquals(-1, binarySearch(array, 4L, comparator))
-        assertEquals(-1, binarySearch(array, 10L, comparator))
+
+        assertEquals(-1, binarySearch(array, 4L))
+        assertEquals(-1, binarySearch(array, 10L))
     }
 
     /** Тест: пустой массив -> не найдено. */
     @Test
     fun `binarySearch works with empty array`() {
-        val comparator = Comparator<Long> { a, b -> a.compareTo(b) }
-        assertEquals(-1, binarySearch(arrayOf(), 1L, comparator))
+
+        assertEquals(-1, binarySearch(arrayOf(), 1L))
     }
 
     /** Тест: бинарный поиск корректно работает с дубликатами. */
     @Test
     fun `binarySearch handles duplicates`() {
         val array = arrayOf(1L, 5L, 5L, 5L, 9L)
-        val comparator = Comparator<Long> { a, b -> a.compareTo(b) }
-        val index = binarySearch(array, 5L, comparator)
+        val index = binarySearch(array, 5L)
+
         assertTrue(index in 1..3, "Индекс найденного элемента 5 должен быть в диапазоне 1-3")
     }
 
@@ -308,23 +437,24 @@ class DsaALibrTest {
     @Test
     fun `binarySearch works with String`() {
         val array = arrayOf("apple", "banana", "cherry", "date")
-        val comparator = Comparator<String> { a, b -> a.compareTo(b) }
-        assertEquals(2, binarySearch(array, "cherry", comparator))
-        assertEquals(-1, binarySearch(array, "fig", comparator))
+
+        assertEquals(2, binarySearch(array, "cherry"))
+        assertEquals(-1, binarySearch(array, "fig"))
     }
 
-    // ================= interpolationSearch (generic) =================
+// ================= interpolationSearch (generic) =================
 
     /** Тест: интерполяционный поиск находит элемент в равномерном массиве. */
     @Test
     fun `interpolationSearch finds element in uniform array`() {
         val array = arrayOf(10L, 20L, 30L, 40L, 50L, 60L, 70L, 80L, 90L, 100L)
         val comparator = Comparator<Long> { a, b -> a.compareTo(b) }
-        val toDouble: (Long) -> Long = { it }
 
-        assertEquals(8, interpolationSearch(array, 90L, comparator, toDouble))
-        assertEquals(0, interpolationSearch(array, 10L, comparator, toDouble))
-        assertEquals(9, interpolationSearch(array, 100L, comparator, toDouble))
+        val toDouble: (Long) -> Double = { it.toDouble() }
+
+        assertEquals(8L, interpolationSearch(array, 90L, comparator, toDouble))
+        assertEquals(0L, interpolationSearch(array, 10L, comparator, toDouble))
+        assertEquals(9L, interpolationSearch(array, 100L, comparator, toDouble))
     }
 
     /** Тест: элемент не найден -> возвращает -1. */
@@ -332,10 +462,10 @@ class DsaALibrTest {
     fun `interpolationSearch returns -1 for missing element`() {
         val array = arrayOf(10L, 20L, 30L, 40L, 50L)
         val comparator = Comparator<Long> { a, b -> a.compareTo(b) }
-        val toDouble: (Long) -> Long = { it }
+        val toDouble: (Long) -> Double = { it.toDouble() }
 
-        assertEquals(-1, interpolationSearch(array, 25L, comparator, toDouble))
-        assertEquals(-1, interpolationSearch(array, 5L, comparator, toDouble))
+        assertEquals(-1L, interpolationSearch(array, 25L, comparator, toDouble))
+        assertEquals(-1L, interpolationSearch(array, 5L, comparator, toDouble))
     }
 
     /** Тест: работает и с неравномерным массивом (но эффективность падает). */
@@ -343,10 +473,10 @@ class DsaALibrTest {
     fun `interpolationSearch works with non-uniform array`() {
         val array = arrayOf(1L, 2L, 5L, 10L, 20L, 50L, 100L, 200L, 500L, 1000L)
         val comparator = Comparator<Long> { a, b -> a.compareTo(b) }
-        val toDouble: (Long) -> Long = { it }
+        val toDouble: (Long) -> Double = { it.toDouble() }
 
         val index = interpolationSearch(array, 100L, comparator, toDouble)
-        assertEquals(6, index)
+        assertEquals(6L, index)
     }
 
     /** Тест: корректно обрабатывает границы. */
@@ -354,10 +484,10 @@ class DsaALibrTest {
     fun `interpolationSearch handles edge values`() {
         val array = arrayOf(5L, 10L, 15L, 20L, 25L)
         val comparator = Comparator<Long> { a, b -> a.compareTo(b) }
-        val toDouble: (Long) -> Long = { it }
+        val toDouble: (Long) -> Double = { it.toDouble() }
 
-        assertEquals(0, interpolationSearch(array, 5L, comparator, toDouble))
-        assertEquals(4, interpolationSearch(array, 25L, comparator, toDouble))
+        assertEquals(0L, interpolationSearch(array, 5L, comparator, toDouble))
+        assertEquals(4L, interpolationSearch(array, 25L, comparator, toDouble))
     }
 }
 

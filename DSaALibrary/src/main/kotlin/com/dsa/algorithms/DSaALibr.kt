@@ -5,8 +5,10 @@ package com.dsa.algorithms
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStreamWriter
+import kotlin.collections.mutableListOf
 import kotlin.random.Random
 
+// ================= ПОДСЧЁТ ВРЕМЕНИ =================
 /**
  * Измеряет суммарное время выполнения [operation] за [iterations] повторов.
  * Возвращает время в наносекундах (для перевода в мс: делите на 1_000_000.0).
@@ -29,7 +31,7 @@ fun <T> measureExecutionTime(
 }
 
 // ================= ЧИСЛОВЫЕ ФУНКЦИИ (LongArray) =================
-// Эти функции требуют арифметических операций или специфичного парсинга,
+// Эти функции требуют арифметических операций,
 // поэтому оставлены для типа LongArray.
 
 /**
@@ -47,6 +49,7 @@ fun generateRandomArray(
     max: Long = 1000,
     seed: Long? = null
 ): LongArray {
+
     require(size >= 0) { "Размер массива не может быть отрицательным" }
     require(min < max) { "min должен быть меньше max" }
 
@@ -69,6 +72,7 @@ fun fillArrayWithRandom(
     max: Long = 1000,
     seed: Long? = null
 ): LongArray {
+
     require(min < max) { "min должен быть меньше max" }
     val random = seed?.let { Random(it) } ?: Random
     for (i in array.indices) {
@@ -76,6 +80,8 @@ fun fillArrayWithRandom(
     }
     return array
 }
+
+// ================= СОХРАНИТЬ/ЗАГРУЗИТЬ МАССИВ В/ИЗ ФАЙЛА =================
 
 /**
  * Сохраняет массив целых чисел типа Long в текстовый файл.
@@ -127,6 +133,8 @@ fun loadArrayFromFile(
     }
 }
 
+// ================= СОРТИРОВКА МАССИВА =================
+
 /**
  * Возвращает отсортированную копию массива (по возрастанию согласно компаратору).
  * Исходный массив не изменяется.
@@ -141,29 +149,208 @@ fun <T> sortArrayAscending(array: Array<T>, comparator: Comparator<T>): Array<T>
 }
 
 /**
- * Сортирует массив по возрастанию на месте согласно компаратору.
+ * Сортирует массив по возрастанию (изменяет данный массив).
  *
  * ## Сложность:
- * - Время: **O(n^2)** — реализован алгоритм пузырьковой сортировки (для учебных целей)
- * - Память: **O(1)** — сортировка на месте без выделения дополнительной памяти
+ * - Время: **O(n^2)** — реализован алгоритм пузырьковой сортировки.
  *
  * @param T тип элементов, поддерживающий сравнение через компаратор
  * @param array массив для сортировки
  * @param comparator объект, определяющий порядок сравнения элементов
  * @return тот же массив, отсортированный по возрастанию
  */
-fun <T> sortArrayInPlace(array: Array<T>, comparator: Comparator<T>): Array<T> {
+fun <T> BubleSortArrayInPlace(array: Array<T>, comparator: Comparator<T>): Array<T> {
+
     val n = array.size
+
     for (i in 0 until n - 1) {
+
         for (j in 0 until n - 1 - i) {
+
+            // сравнение
             if (comparator.compare(array[j], array[j + 1]) > 0) {
+
                 val temp = array[j]
+
                 array[j] = array[j + 1]
+
                 array[j + 1] = temp
             }
         }
     }
     return array
+}
+
+/**
+ * Сортирует массив по возрастанию с помощью алгоритма быстрой сортировки (изменяет исходный массив).
+ *
+ * ## Как работает:
+ * 1. Выбирается опорный элемент (`pivot`) из середины отрезка.
+ * 2. Массив делится на две части: элементы < pivot -> влево, > pivot -> вправо.
+ * 3. Алгоритм рекурсивно применяется к левой и правой части.
+ *
+ * ## Сложность:
+ * - Время (средний случай): **O(n log n)**
+ * - Время (худший случай): **O(n²)** — при неудачном выборе pivot (например, уже отсортированный массив)
+ *
+ * @param T тип элементов, который должен реализовывать `Comparable<T>` для возможности сравнения
+ * @param array массив типа `Array<T>` для сортировки
+ * @param left начальный индекс сортируемого отрезка (обычно `0`)
+ * @param right конечный индекс сортируемого отрезка (обычно `array.lastIndex`)
+ * @return Unit (функция изменяет массив «на месте», явный возврат не требуется)
+ */
+fun <T: Comparable<T>> quickSort(
+    array: Array<T>,
+    left: Int,
+    right: Int) {
+
+    // если наш массив уже отсортирован (состоит из 1 элемента)
+    // по факту - условие выхода из рекурсии
+    if (left >= right) return
+
+    // берём число, которое хранится в середине массива
+    val pivot = array[(left + right) / 2]
+
+    // элемент, который пойдёт слева направо и будет искать больше pivot
+    var i = left
+
+    // элемент, который пойдёт справа налево и будет искать меньше pivot
+    var j = right
+
+    // цикл разделения на подмассивы
+    while(i <= j){
+
+        // пока левый элемент меньше pivot - сдвигаем его вправо
+        while (array[i] < pivot) i++
+
+        // пока правый элемент больше pivot - сдвигаем его влево
+        while (array[j] > pivot) j--
+
+        // дополнительная проверка, если нашёлся такой элемент, который "стоит не на своём месте"
+        if (i <= j){
+            val temp = array[i]
+            array[i] = array[j]
+            array[j] = temp
+            i++
+            j--
+        }
+    }
+
+    // дальше с помощью рекурсии сортируем наши получившиеся массивы
+    //
+    quickSort(array, left, j)
+    quickSort(array, i, right)
+}
+
+/**
+ * Сортирует массив по возрастанию с помощью алгоритма сортировки слиянием (Merge Sort).
+ *
+ * ## Как работает (принцип «разделяй и властвуй»):
+ * 1. **Базовый случай**: если массив содержит 0 или 1 элемент, он уже считается отсортированным.
+ * 2. **Разделение**: массив делится пополам на `left` и `right` с помощью `copyOfRange`.
+ * 3. **Рекурсия**: `mergeSort` вызывается рекурсивно для каждой половины до достижения базового случая.
+ * 4. **Слияние**: отсортированные половины объединяются функцией [merge] в один отсортированный массив.
+ *
+ * ## Сложность:
+ * - Время (все случаи): **O(n log n)** — массив делится пополам `log n` раз, слияние на каждом уровне требует `O(n)`.
+ *
+ * @param T тип элементов, который должен реализовывать `Comparable<T>` для возможности сравнения
+ * @param array массив типа `Array<T>` для сортировки
+ * @return новый отсортированный массив типа `Array<T>` (исходный массив не изменяется)
+ */
+fun <T: Comparable<T>> mergeSort(
+    array: Array<T>,
+): Array<T> {
+    if (array.size <= 1 ) return array
+
+    // вычисляем индекс элемента посередине
+    val mid = array.size / 2
+
+    // разбиваем массив
+    // от 0 элемента до mid
+    val left = array.copyOfRange(0, mid)
+
+    // и от mid до последнего элемента
+    val right = array.copyOfRange(mid, array.size)
+
+    // рекурсией уже делаем тоже самое, только с ранее разделёнными массивами
+    // получаем по итогу деиничные массивы
+    val sortedLeft = mergeSort(left)
+    val sortedRight = mergeSort(right)
+
+    // возвращаем с помощью основной функции отсортированный массив
+    return merge(sortedLeft, sortedRight)
+}
+
+/**
+ * Объединяет два уже отсортированных массива в один отсортированный массив.
+ *
+ * ## Алгоритм слияния:
+ * 1. Создаётся буферный массив `result` размером `left.size + right.size` того же типа, что и входные массивы.
+ * 2. Три указателя (`i`, `j`, `k`) последовательно проходят по `left`, `right` и `result`.
+ * 3. На каждом шаге сравниваются текущие элементы `left[i]` и `right[j]`:
+ *    - меньший элемент записывается в `result[k]`, соответствующие указатели сдвигаются.
+ * 4. После исчерпания одного из массивов оставшиеся элементы второго дописываются в конец результата.
+ *
+ * ## Сложность:
+ * - Время: **O(n)**, где `n = left.size + right.size` — каждый элемент просматривается ровно один раз.
+ *
+ * @param T тип элементов, который должен реализовывать `Comparable<T>`
+ * @param left первый отсортированный массив
+ * @param right второй отсортированный массив
+ * @return новый массив, содержащий все элементы из `left` и `right` в отсортированном порядке
+ */
+private fun <T: Comparable<T>> merge(
+    left: Array<T>, right: Array<T>
+): Array<T> {
+
+
+    // val result = ArrayList<T>(left.size + right.size)
+    // val result = mutableListOf<T>()
+    // val result = arrayOfNulls<Any?>(left.size + right.size)
+
+    // чтобы не было проблем с типом, копируем уже созданный массив (который мы передаём в функцию) с определённым типом
+    val result = left.copyOf(left.size + right.size)
+
+    var i = 0
+    var j = 0
+    var k = 0
+
+    // TODO: В ОТДЕЛЬНУЮ ФУНКЦИЮ АЛГОРИТМ
+
+    while (i < left.size && j < right.size){
+
+        if (left[i] <= right[j]){
+            result[k] = left[i]
+            //result.add(left[i])
+            i++
+            k++
+
+        } else {
+            result[k] = right[j]
+            //result.add(right[j])
+            j++
+            k++
+        }
+    }
+
+    while (i < left.size){
+        result[k] = left[i]
+        //result.add(left[i])
+        i++
+        k++
+    }
+
+    while (j < right.size){
+        result[k] = right[j]
+        //result.add(right[j])
+        j++
+        k++
+    }
+
+    //return result.toTypedArray()
+    return result as Array<T>
+
 }
 
 /**
@@ -184,6 +371,9 @@ fun <T> isArraySortedAscending(array: Array<T>, comparator: Comparator<T>): Bool
     }
     return true
 }
+
+
+// ================= ФУНКЦИИ ПОИСКА =================
 
 /**
  * Линейный поиск элемента в массиве с использованием компаратора.
@@ -231,34 +421,38 @@ fun <T> findLineElement(array: Array<T>, target: T, comparator: Comparator<T>): 
  * Не использовать, когда: массив не отсортирован или данные равномерно распределены (лучше [interpolationSearch] для чисел).
  *
  * @param T тип элементов, поддерживающий сравнение через компаратор
+ * @param Comparable<T> Интерфейс, который гарантирует, что объекты типа T можно сравнивать друг с другом
  * @param array отсортированный по возрастанию (согласно [comparator]) массив
  * @param target искомое значение
  * @param comparator объект, определяющий порядок сравнения элементов
  * @return индекс элемента или -1 если не найден
  */
-fun <T> binarySearch(
-    array: Array<T>,
-    target: T,
-    comparator: Comparator<T>
-): Long {
+fun <T: Comparable<T>> binarySearch(
+    array: Array<T>, target: T
+): Long{
     var left = 0
     var right = array.size - 1
 
-    while (left <= right) {
-        val mid = left + (right - left) / 2
-        val cmp = comparator.compare(array[mid], target)
+    while (left <= right){
 
-        when {
-            cmp == 0 -> return mid.toLong()
-            cmp < 0 -> left = mid + 1
-            else -> right = mid - 1
+        val mid = left + (right - left) / 2
+
+        if (array[mid] == target){
+            return mid.toLong()
+        } else{
+            if (array[mid] < target){
+                left = mid + 1
+            } else {
+                right = mid - 1
+            }
         }
     }
+
     return -1
 }
 
 /**
- * Интерполяционный поиск элемента в отсортированном массиве (обобщённая версия).
+ * Интерполяционный поиск элемента в отсортированном массиве.
  * Оценивает позицию искомого элемента на основе его числового значения относительно границ диапазона.
  *
  * ## Сложность:
@@ -270,7 +464,6 @@ fun <T> binarySearch(
  *
  * ## Важные условия:
  * - Массив **должен быть отсортирован** согласно [comparator]
- * - Функция [toDouble] должна возвращать значения, сохраняющие порядок элементов
  * - Данные должны быть **равномерно распределёнными** для эффективности
  *
  * @param T тип элементов массива
@@ -284,17 +477,19 @@ fun <T> interpolationSearch(
     array: Array<T>,
     target: T,
     comparator: Comparator<T>,
-    toLong: (T) -> Long
+    toDouble: (T) -> Double
 ): Long {
+
     var left = 0
     var right = array.size - 1
 
     while (left <= right) {
-        val targetVal = toLong(target)
+
+        val targetVal = toDouble(target)
 
         // значения
-        val leftVal = toLong(array[left])
-        val rightVal = toLong(array[right])
+        val leftVal = toDouble(array[left])
+        val rightVal = toDouble(array[right])
 
         // Защита от деления на ноль (все элементы в диапазоне одинаковы)
         if (rightVal == leftVal) {
@@ -335,7 +530,7 @@ fun <T> interpolationSearch(
  * - когда нужен поиск по **сложному условию** (не просто сравнение с значением)
  * - когда массив **не отсортирован**
  * - когда нужно найти **первый подходящий** элемент
- * - Не стоит для простого поиска по значению — используйте [binarySearch] или [findLineElement]
+ * - Не стоит для простого поиска по значению
  *
  * @param T тип элементов массива
  * @param array массив для поиска
@@ -347,10 +542,21 @@ fun <T> interpolationSearch(
  * val firstEven = findByPredicate(numbers) { it.toInt() % 2 == 0 }  // "12"
  */
 fun <T> findByPredicate(array: Array<T>, predicate: (T) -> Boolean): T? {
+
+    // 1. Последовательный обход всех элементов массива
     for (element in array) {
+
+        // 2. Применение предиката к текущему элементу
+        // Если условие выполнено — предикат вернёт true
         if (predicate(element)) {
+
+            // 3. Немедленный возврат найденного элемента
+            // Функция завершает работу, не проверяя остальные элементы
             return element
         }
+        // Если условие ложно — цикл продолжается
     }
+
+    // 4. Если цикл завершился без возврата — элемент не найден
     return null
 }
