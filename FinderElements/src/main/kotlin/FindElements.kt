@@ -21,10 +21,12 @@ fun randomElement(array: LongArray): Long {
 fun main() {
 
     val array = generateRandomArray(
-        size = 1_000_000,
+        size = 100,
         min = 1L,
         max = 30_00L
     )
+
+
 
     println("исходный не отсортированный массив: ${array.joinToString()}")
 
@@ -34,6 +36,22 @@ fun main() {
     // почему Int - потому что Int самый минимальный и достаточный тмип для сравнения чисел
     //
     val longComparator = Comparator<Long> { a, b -> a.compareTo(b) }
+
+    val arrayNew = arrayOf(8L, 33L, 17L, -2L, 200L, 21L, 11L)
+
+    val arrayNewSort = BubleSortArrayInPlace(arrayNew, longComparator)
+
+    println("-------------------------")
+    println(arrayNewSort.joinToString())
+    println("-------------------------")
+
+    val targetT = 9L
+
+    val binarSerch = binarySearch(arrayNew, targetT, longComparator)
+
+    println("-------------------------")
+    println(binarSerch)
+    println("-------------------------")
 
     // Сортируем массив (по возрастанию, для бинарного поиска)
     // sortArrayAscending теперь принимает Array<T> и Comparator
@@ -54,7 +72,7 @@ fun main() {
     // findLineElement теперь принимает Array<T>, target: T и Comparator
     val resL = findLineElement(array.toTypedArray(), target, longComparator)
 
-    if (resL != -1) {
+    if (resL != -1L) {
         println("Линейный: цель ($target) найдена на позиции $resL")
     } else {
         println("Такого числа ($target) в массиве нет")
@@ -70,7 +88,7 @@ fun main() {
      */
     val result = binarySearch(sortArr, target, longComparator)
 
-    if (result != -1) {
+    if (result != -1L) {
         println("Бинарный: цель ($target) найдена на позиции $result")
     } else {
         println("Такого числа ($target) в массиве нет")
@@ -88,7 +106,7 @@ fun main() {
     val toDouble: (Long) -> Double = { it.toDouble() }
     val resultInterp = interpolationSearch(sortArr, target, longComparator, toDouble)
 
-    if (resultInterp != -1) {
+    if (resultInterp != -1L) {
         println("Интерполяционный: цель ($target) найдена на позиции $resultInterp")
     } else {
         println("Такого числа ($target) в массиве нет")
